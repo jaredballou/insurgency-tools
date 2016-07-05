@@ -1,0 +1,11 @@
+[submodule "data"]
+	path = data
+	url = git@github.com:jaredballou/insurgency-data.git
+	branch = master
+[submodule "theaters"]
+	path = theaters
+	url = git@github.com:jaredballou/insurgency-theaters.git
+	branch = master
+[submodule "thirdparty"]
+	path = thirdparty
+	url = git@github.com:jaredballou/insurgency-thirdparty.git

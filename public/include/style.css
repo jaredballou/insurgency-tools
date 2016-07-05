@@ -1,0 +1,260 @@
+	*{
+		font-family: Verdana;
+	}
+	body {
+		//padding-top: 50px;
+	}
+	body, html, .container {
+		height: 100%;
+		min-height:100%;
+	}
+	table.floatThead-table {
+		background-color: #FFFFFF;
+	}
+	td.details-control {
+		background: url("../images/details_open.png") no-repeat center center;
+		cursor: pointer;
+	}
+	tr.shown td.details-control {
+		background: url("../images/details_close.png") no-repeat center center;
+	}
+	.beta {
+		background: #cc0000;
+		border: 1px solid black;
+		margin: 3px;
+		display: inline-block;
+	}
+	.bodygraph {
+		position: relative;
+		height: 340px;
+		width: 157px;
+		background-image: url("../images/stats/body.png");
+	}
+	.vgui {
+		background-size: 256px 128px;
+		background-repeat: no-repeat;
+		background-position: top 16px center;
+		min-height: 144px;
+		height: 144px;
+		width: 256px;
+		text-align: center;
+		display: inline-block;
+		white-space: normal;
+		font-weight: bold;
+		font-size: 1.2em;
+		text-shadow: #000 0px 0px 1px, #000 -1px 0px 1px, #000 -1px 0px 1px, #000 0px 0px 1px;\
+		-webkit-font-smoothing: antialiased;
+	}
+	.title {
+		margin: 5px;
+		align: center;
+		font-size: 200%;
+		font-weight: bold;
+	}
+	.help {
+		margin: 5px;
+		margin: 15px;
+	}
+	.section {
+		margin: 5px;
+		font-size: 175%;
+		font-weight: bold;
+	}
+	.subsection {
+		margin: 5px;
+		font-size: 150%;
+		font-weight: bold;
+	}
+	.desc {
+		margin: 5px;
+		font-style: italic;
+	}
+
+
+
+// Maps
+	.map-image: {
+		position: absolute;
+		left: 0px;
+		top: 0px;'
+		z-index: 0;
+	}
+	#navmesh-overlay,#heatmap-overlay,#grid-overlay: {
+		pointer-events:none;
+		position: absolute;
+		left: 0px;
+		top: 0px;
+	}
+	#grid-overlay: {
+		z-index: -3;
+	}
+	#navmesh-overlay {
+		z-index: -2;
+	}
+	#heatmap-overlay: {
+		z-index: -1;
+	}
+	.minwidth {
+		min-width:100px;
+		width: auto !important;
+		width: 100px;
+	}
+	body {
+//		white-space: nowrap;
+	}
+	.overlay, .map{
+		top: 0;
+		left: 0;
+	}
+	.map, .key{
+		white-space: normal;
+		vertical-align: top;
+		display: inline-block;
+		position: relative;
+	}
+	.overlay{
+		position: absolute;
+	}
+	.obj {
+		pointer-events: none;
+		width: 64px;
+		height: 64px;
+		margin-left: -32px;
+		margin-top: -32px;
+		vertical-align:middle;
+		text-align:center;
+		word-wrap: break-word;
+		color: #fff;
+		font-weight:bold;
+		font-size:1.5em;
+		line-height: 64px;
+		z-index: 100;
+	}
+
+	.noteam {
+		background-color: rgb(255,255,255);
+	}
+	.obj_noteam_bg {
+		background-color: rgba(255,255,255,0.5);
+		-webkit-mask-image: url('');
+	}
+	.obj_noteam_fg {
+		background-image: url('images/maps/c_obj_noteam.png');
+	}
+	.obj_cache_noteam_bg {
+		background-color: rgba(255,255,255,0.5);
+		-webkit-mask-image: url('');
+	}
+	.obj_cache_noteam_fg {
+		background-image: url('images/maps/c_obj_cache_noteam.png');
+	}
+
+	.neutral {
+		background-color: rgb(132,150,28);
+	}
+	.obj_neutral_bg {
+		background-color: rgba(132,150,28,0.5);
+		-webkit-mask-image: url('');
+	}
+	.obj_neutral_fg {
+		background-image: url('images/maps/c_obj_neutral.png');
+	}
+	.obj_cache_neutral_bg {
+		background-color: rgba(132,150,28,0.5);
+		-webkit-mask-image: url('');
+	}
+	.obj_cache_neutral_fg {
+		background-image: url('images/maps/c_obj_cache_neutral.png');
+	}
+
+	.friend {
+		background-color: rgb(83,157,178);
+	}
+	.obj_friend_bg {
+		background-color: rgba(83,157,178,0.5);
+		-webkit-mask-image: url('/data/mods/insurgency/2.1.6.0/materials/vgui/hud/obj_cache_friend.png');
+	}
+	.obj_friend_fg {
+		background-image: url('images/maps/c_obj_friend.png');
+	}
+	.obj_cache_friend_bg {
+		background-color: rgba(83,157,178,0.5);
+		-webkit-mask-image: url('/data/mods/insurgency/2.1.6.0/materials/vgui/hud/obj_cache_friend.png');
+	}
+	.obj_cache_friend_fg {
+		background-image: url('images/maps/c_obj_cache_friend.png');
+	}
+
+	.enemy {
+		background-color: rgb(172,64,41);
+	}
+	.obj_enemy_bg {
+		background-color: rgba(172,64,41,0.5);
+		-webkit-mask-image: url('/data/mods/insurgency/2.1.6.0/materials/vgui/hud/obj_cache_enemy.png');
+	}
+	.obj_enemy_fg {
+		background-image: url('images/maps/c_obj_enemy.png');
+	}
+	.obj_cache_enemy_bg {
+		background-color: rgba(172,64,41,0.5);
+		-webkit-mask-image: url('/data/mods/insurgency/2.1.6.0/materials/vgui/hud/obj_cache_enemy.png');
+	}
+	.obj_cache_enemy_fg {
+		background-image: url('images/maps/c_obj_cache_enemy.png');
+	}
+
+	.maparea {
+		background-color: rgb(109,96,80);
+	}
+	.obj_maparea_bg {
+		background-color: rgba(109,96,80,0.5);
+		-webkit-mask-image: url('');
+	}
+	.obj_maparea_fg {
+		background-image: url('images/maps/c_obj_maparea.png');
+	}
+	.obj_cache_maparea_bg {
+		background-color: rgba(109,96,80,0.5);
+		-webkit-mask-image: url('');
+	}
+	.obj_cache_maparea_fg {
+		background-image: url('images/maps/c_obj_cache_maparea.png');
+	}
+
+.canvas {
+	top: 0;
+	left: 0;
+	z-index: -10;
+	position: absolute;
+	width: 100%;
+	height: 1024px;
+}
+.area{
+	vertical-align: middle;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	pointer-events: none;
+	border:3px solid #000;
+	z-index: 20;
+}
+.maplabel,.friend-label,.enemy-label,.neutral-label,.noteam-label,.area-label,.area{
+	vertical-align:middle;
+	text-align:center;
+	word-wrap: break-word;
+	color: #fff;
+	font-weight:bold;
+	font-size:1.5em;
+	line-height: 64px;
+	z-index: 100;
+}
+
+.maplabel,.label,.maplabel {
+	line-height: 4em;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.label{
+	border: 1px solid;
+}

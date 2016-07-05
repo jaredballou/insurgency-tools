@@ -1,0 +1,31 @@
+heading: This is where I am going to list and document the tools I have been working on for the Insurgency standalone game released in 2014. I release everything I create under the GPLv2, I haven't commented all the code yet since the community is small and we all pretty much know each other, but my intent is to distribute everything free of charge, get feedback and bug fixes back, and build robust and useful tools for players that will help strengthen the community who play it. Everything I do is maintained in <a href='https://github.com/jaredballou'>my Github repositories</a> and aren't yet in a state where I have ZIP downloads packaged. <a href='http://steamcommunity.com/id/jballou'>I'm always on Steam, feel free to add me.</a>
+github:
+  user: jaredballou
+  repos:
+    insurgency-data:
+      title: Insurgency Game Data
+      content: This contains files that support the Web Tools and SourceMod plugins for Insurgency. There is a tool which extracts the files from the game, and converts them into formats useful for the Web Tools.
+    insurgency-hlstatsx:
+      title: HLStatsX for Insurgency
+      content: Forked HLStatsX 1.6.19 with added support for Insurgency. Includes weapon icons and script to generate them, Heatmap support, integration with localization and translation data from Insurgency Game Data, and more.
+    insurgency-sourcemod:
+      title: SourceMod Plugins
+      content: A complete SourceMod tree that contains a number of Insurgency plugins.
+    insurgency-theaters:
+      title: Insurgency Theaters
+      content: Theater files for custom game rules. Also includes "snippets", smaller pieces of theater code that are used by the Theater Creator tool.
+    insurgency-thirdparty:
+      title: Insurgency Tools - Third-Party Libraries
+      content: A number of external dependencies for the Insurgency Tools.
+    insurgency-tools:
+      title: Insurgency Tools
+      content: A collection of command-line and web-based tools to interact with Insurgency. Command line tools for extracting Insurgency data, decompiling maps, processing game files into JSON cache files, and a whole bunch of other things. Web tools include stats tables, map viewer, theater generator, and more.
+    lgsm-gamedata:
+      title: LGSM-Python Game Data
+      content: Game data files to support my experimental LGSM-Python
+    lgsm-python:
+      title: LGSM-Python
+      content: A ground-up rebuilding of the Linux Game Server Manager in Python. Goals are to use Game Data files to allow support for a number of games, module-based functionality, and helping me learn to write Python well. This is very raw, but feedback and help would be greatly appreciated.
+    linuxgsm:
+      title: Linux Game Server Manager (forked)
+      content: A fork of Daniel Gibbs' brilliant LGSM script, my version shifts from his model of specific scripts for each game and creates one core script. Games are supported via a Game Data system, where the settings are merged together from common files to generate a single game-specific set of options for the script to process. Also adds support for symlink-based instances using one central installation, SourceMod installation, a number of updates to dependency and installation handling, and more. This is experimental and not well tested as yet, as I stopped working on this and started designing and initial writing of my own LGSM-Python based on Python and a more modular design.

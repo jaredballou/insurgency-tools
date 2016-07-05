@@ -1,0 +1,3 @@
+# Allow access for all http requests by default
+#deny from all
+allow from all
