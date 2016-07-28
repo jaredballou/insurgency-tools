@@ -494,7 +494,9 @@ function GenerateStatTable() {
 		$stats_tables['Explosives']['items'][$explosivename] = $thisitem;
 	}
 	foreach ($theater['player_templates'] as $classname => $classdata) {
+		$img = getvgui($classname,'css','vgui/inventory',256,512);
 		$thisitem = array();
+		$thisitem['Img'] = $img;
 		$thisitem['Name'] = getlookup($classdata['print_name']);
 		$thisitem['Team'] = printval($classdata,"team");
 		$thisitem['Models'] = printval($classdata,"models");

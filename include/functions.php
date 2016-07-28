@@ -112,7 +112,6 @@ function LoadMods($path,$pattern='*',$level=0) {
 	return $result;
 }
 $mods = LoadMods("{$datapath}/mods");
-
 // Set version and newest_version to the latest one. Try to get the version from Steam, otherwise just choose the newest available.
 ksort($mods);
 
@@ -1075,16 +1074,51 @@ function GetMaterial($name,$type='img',$path='') {
 /* getvgui
 Display the icon for an object
 */
-function getvgui($name,$type='img',$path='vgui/inventory') {
+function getvgui($name, $type='img', $path='vgui/inventory', $width=256, $height=128) {
 	$img = GetMaterial($name,$type,$path);
+	$unit_height = (is_numeric($height)) ? "px" : "";
+	$unit_width = (is_numeric($width)) ? "px" : "";
+
+	$css = array();
+
+	$top_offset = (substr($name, 0, 9 ) == 'template_') ? 0 : 16;
+	$css['background-size'] = "{$width}{$unit_width} {$height}{$unit_height}";
+	$css['background-position'] = 'top {$top_offset}px center';
+	$css['min-height'] = ($height + $top_offset).$unit_height;
+	$css['height'] = ($height + $top_offset).$unit_height;
+	$css['width'] = $width.$unit_width;
+
 	if ($img) {
 		if ($type == 'img')
-			return "<img src='{$img}' alt='{$name}' height='128' width='256'/><br>";
+			return "<img src='{$img}' alt='{$name}' height='{$height}' width='{$width}'/><br>";
 		if ($type == 'bare')
 			return $img;
-		if ($type == 'css')
-			return " style=\"background-image: url('{$img}');\" class='vgui'";
+		if ($type == 'css') {
+			$css['background-image'] = "url('{$img}')";
+			$css_str = generate_css_properties($css);
+			return " style=\"{$css_str}\" class='vgui'";
+		}
 	}
+}
+
+function generate_css_properties($rules, $indent = 0) {
+  $css = '';
+  $prefix = str_repeat('  ', $indent);
+  foreach ($rules as $key => $value) {
+    if (is_array($value)) {
+      $selector = $key;
+      $properties = $value;
+
+      $css .= $prefix . "$selector {\n";
+      $css .= $prefix .grasmash_generate_css_properties($properties, $indent + 1);
+      $css .= $prefix . "}\n";
+    }
+    else {
+      $property = $key;
+      $css .= $prefix . "$property: $value;\n";
+    }
+  }
+  return $css;
 }
 
 // parseLibPath - Load custom library paths, this should only get called after config is loaded but before any other includes are called
