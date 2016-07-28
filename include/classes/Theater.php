@@ -64,9 +64,9 @@ function theater_array_replace()
 		}
 		else
 		{
-			echo "ERROR: Not arrays!\n";
-			var_dump($args[0]);
-			var_dump($args[$i]);
+			//echo "ERROR: Not arrays!\n";
+			//var_dump($args[0]);
+			//var_dump($args[$i]);
 			trigger_error(__FUNCTION__ .'(): Argument #'.($i+1).' is not an array', E_USER_WARNING);
 			return NULL;
 		}
