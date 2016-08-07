@@ -342,6 +342,7 @@ function GenerateStatTable() {
 		$thisitem['RPM'] = printval($item,"rounds_per_minute");
 		$thisitem['Sway'] = printval($item,"sway");
 		$thisitem['Damage'] = 0;
+		$thisitem['Ammo'] = '';
 		if (isset($item["ballistics"])) {
 			$thisitem['Fire Modes'] = printval($item["ballistics"],"FireModes");
 		} else {
@@ -353,6 +354,7 @@ function GenerateStatTable() {
 			$thisitem['Carry'] = printval($expammo,"carry");
 			$thisitem['Carry Max'] = printval($expammo,"carry");
 		} elseif (isset($item["ammo_clip"])) {
+//			$thisitem['Ammo'] = printval($item["explosives"],"entity",1);
 			$ammo = getobject("ammo", $item["ammo_clip"]["ammo_type"]);
 			$dmg = damageatrange($ammo['Damage'], $range);
 			$thisitem['Damage'] = $dmg;
@@ -377,7 +379,6 @@ function GenerateStatTable() {
 		} elseif (isset($item["melee"])) {
 			$thisitem['Damage'] = printval($item["melee"],"MeleeDamage");
 		}
-		$thisitem['Ammo'] = '';
 		$thisitem['Upgrades'] = '';
 		$stats_tables['Weapons']['items'][$wpnname] = $thisitem;
 	}
@@ -386,9 +387,9 @@ function GenerateStatTable() {
 			continue;
 		}
 
-//		if ((substr($upname,0,5) == "base_") || (substr($upname,-5,5) == "_base")) {
-//			continue;
-//		}
+		if ((substr($upname,0,5) == "base_") || (substr($upname,-5,5) == "_base")) {
+			continue;
+		}
 		$upgrade = getobject("weapon_upgrades", $upname,1);
 		$img = getvgui($upname,'css');
 		$thisitem = array();

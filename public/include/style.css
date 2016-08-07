@@ -30,6 +30,9 @@
 		width: 157px;
 		background-image: url("../images/stats/body.png");
 	}
+	td {
+		text-align: center;
+	}
 	.vgui {
 		background-repeat: no-repeat;
 		background-position: top 16px center;
