@@ -15,7 +15,7 @@ $css_content = '
 ';
 $js_content = "
 $(document).ready(function() {
-		$('#cvarlist').dataTable({
+		$('#listing').dataTable({
 			saveState: true,
 			columnDefs: [
 				{
@@ -25,7 +25,7 @@ $(document).ready(function() {
 				}
 			],
 		});
-		$('#cvarlist').floatThead();
+		$('#listing').floatThead();
 } );";
 
 if (isset($_REQUEST['fetch'])) {
@@ -34,46 +34,35 @@ if (isset($_REQUEST['fetch'])) {
 	require_once("{$includepath}/header.php");
 }
 
-// Get versions that have CVAR lists in data
-$dirs = glob("${datapath}/cvarlist/*");
-foreach ($dirs as $dir) {
-	if (!is_dir($dir)) {
-		continue;
-	}
-	$ver = basename($dir);
-	$files = glob("{$dir}/*.csv");
-	foreach ($files as $file) {
-		$fn = basename($file,".csv");
-		$lists[$ver][$fn] = $fn;
-	}
+$lists = GetModFiles('cvarlist');
+//var_dump($lists);
+// Default mod
+$mod="insurgency";
+
+// If mod in request is valid, use it
+if (isset($_REQUEST['mod'])) {
+        if (isset($lists[$_REQUEST['mod']])) {
+                $mod = $_REQUEST['mod'];
+        }
 }
-//asort($lists);
 
 // Select version
-$version = end(array_keys($lists));
+$version = end(array_keys($lists[$mod]));
 if ($_REQUEST['version']) {
-	if (in_array($_REQUEST['version'],array_keys($lists))) {
+	if (in_array($_REQUEST['version'],array_keys($lists[$mod]))) {
 		$version = $_REQUEST['version'];
 	}
 }
 
 // Select list type
-$listtype = end($lists[$version]);
-if ($_REQUEST['listtype']) {
-	if (in_array($_REQUEST['listtype'],array_keys($lists[$version]))) {
-		$listtype = $_REQUEST['listtype'];
+$cvarlist = end($lists[$mod][$version]);
+if ($_REQUEST['cvarlist']) {
+	if (in_array($_REQUEST['cvarlist'],array_keys($lists[$mod][$version]))) {
+		$cvarlist = $_REQUEST['cvarlist'];
 	}
 }
-//var_dump($lists,$version,$listtype);
 
-// If we don't have sane values, abort
-if ((!$version) || (!$listtype)) {
-	echo "Data not found";
-	include "{$includepath}/footer.php";
-	exit;
-}
-
-$data = GetCVARList($version,$listtype);
+$data = GetCVARList($mod,$version,$cvarlist);
 
 if ($_REQUEST['fetch'] == 'list') {
 	header('Content-Type: application/json');
@@ -83,36 +72,31 @@ if ($_REQUEST['fetch'] == 'list') {
 
 //Start display
 startbody();
+echo "<div style='margin: 5px;'>\n";
+echo "<h1>CVAR List</h1>\n";
+echo "<h2>Viewing {$cvarlist} from {$mod} version {$version}</h2>\n";
+echo "<form action='{$_SERVER['PHP_SELF']}' method='get'>\n";
+DisplayModSelection(0,'cvarlist');
+echo "<input type='submit' value='Parse'>\n";
+echo "</form>\n";
+echo "</div>\n";
+
 DisplayCVARList($data);
 require_once("{$includepath}/footer.php");
 exit;
 
 function DisplayCVARList($data) {
-	global $version,$listtype,$lists;
 	//Collect Headers
 	$header="";
 	foreach (array_keys(current($data)) as $field) {
 		$header.="<th>{$field}</th>";
 	}
-	echo "<h2>Version {$version} - {$listtype}</h2>\n";
-	echo "<form><select name='version'>";
-	foreach (array_keys($lists) as $ver) {
-		$sel = ($ver == $version) ? ' SELECTED' : '';
-		echo "				<option{$sel}>{$ver}</option>\n";
-	}
-	echo "</select><select name='listtype'>";
-	foreach ($lists[$version] as $list) {
-		$sel = ($list == $listtype) ? ' SELECTED' : '';
-		echo "				<option{$sel}>{$list}</option>\n";
-	}
-	echo "</select><input type='submit' name='command' value='Load'><br><input type='submit' name='command' value='Dump Config'></form>\n";
-	echo "CVAR lists are created from the game, by running <b>cvarlist log {$listtype}.csv</b> in console<br>\n";
 	if ($_REQUEST['command'] == 'Dump Config') {
 		echo "<textarea cols='80' rows='40'>\n";
 		echo CreateConfigFromCVARList($data);
 		echo "</textarea>\n";
 	} else {
-		echo "<table class='display' id='cvarlist'>\n";
+		echo "<table class='display' id='listing'>\n";
 		echo "<thead><tr>{$header}</tr>\n</thead>\n<tbody>\n";
 		foreach ($data as $row) {
 			echo "<tr>";
@@ -131,13 +115,13 @@ function DisplayCVARList($data) {
 
 
 
-function GetCVARList($version,$listtype) {
+function GetCVARList($mod,$version,$cvarlist) {
 	global $datapath;
 
 	// Load settings if available
 	$settings = array();
-	$settingfile = "${datapath}/cvarlist/{$version}/{$listtype}.txt";
-	$cachefile = "cvarlist/{$version}/{$listtype}.json";
+	$settingfile = "${datapath}/mods/{$mod}/{$version}/cvarlist/{$cvarlist}.txt";
+	$cachefile = "cvarlist/{$mod}/{$version}/{$cvarlist}.json";
 	$data = GetCacheFile($cachefile);
 	if ($data) {
 		return $data;
@@ -151,7 +135,7 @@ function GetCVARList($version,$listtype) {
 	}
 
 	// Load CVAR list
-	$listfile = "${datapath}/cvarlist/{$version}/{$listtype}.csv";
+	$listfile = "${datapath}/mods/{$mod}/{$version}/cvarlist/{$cvarlist}.csv";
 	$f = fopen($listfile, "r");
 	// Load the file into fields
 	while (($line = fgetcsv($f)) !== false) {
@@ -166,8 +150,6 @@ function GetCVARList($version,$listtype) {
 			if ($row['Value'] != $settings[$row['Name']]) {
 				$row['Default'] = $row['Value'];
 				$row['Value'] = $settings[$row['Name']];
-				//$row['Value'].=" ({$settings[$row['Name']]})";
-				//var_dump($row['Name'].": ".$row['Value']);
 			}
 		}
 		$data[] = $row;

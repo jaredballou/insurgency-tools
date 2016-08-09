@@ -1,37 +1,16 @@
 <?php
-function DisplayModSelection($compare=0, $type='theater') {
-	$fields = array('mod','version',$type);
-	$fieldname = $ext = $type;
-	$suffix = ($compare) ? '_compare' : '';
-	$js = $vars = $data = array();
-
-	$path = array("{$type}s");
-	foreach ($fields as $field) {
-		switch ($field) {
-			case 'theater':
-				$fieldname = 'theaterfile';
-				array_unshift($path,'scripts');
-				break;
-			case 'map':
-				$path = array('resource','overviews');
-			default:
-				$fieldname = $field;
-		}
-		$data[$field] = 
-			($suffix) ?
-				(($GLOBALS["{$fieldname}{$suffix}"] == $GLOBALS[$fieldname]) ? '-' : $GLOBALS["{$fieldname}{$suffix}"]) :
-				$GLOBALS[$fieldname];
-		echo "{$field}: <select name='{$field}{$suffix}' id='{$field}{$suffix}'></select>\n";
-		$vars[$field] = $data[$field];
-		$jsf = ($field == $type) ? 'item' : $field;
-		$js[] = "var select_{$jsf}{$suffix} = \$('#{$field}{$suffix}');";
-		$js[] = "var cur_{$jsf}{$suffix} = '{$vars[$field]}';";
+function GetModFiles($type='theater') {
+	switch ($type) {
+		case 'theater':
+			$path = array_unshift($path,'scripts');
+			break;
+		case 'map':
+			$path = array("${type}s");
+			break;
+		case 'cvarlist':
+			$path = array($type);
+			break;
 	}
-
-	// If showing comparison options, put in blank as first entry to denote no comparison
-	if ($compare)
-		$vars['data']['-']['-']['-'] = '-';
-
 	// Populate data hash
 	foreach ($GLOBALS['mods'] as $mname => $mdata) {
 		foreach ($mdata as $vname => $vdata) {
@@ -48,14 +27,47 @@ function DisplayModSelection($compare=0, $type='theater') {
 						continue;
 					}
 				}
-				$vars['data'][$mname][$vname][$bn] = $bn;
+				$data[$mname][$vname][$bn] = $bn;
 			}
 		}
 	}
+	return($data);
+}
+function DisplayModSelection($compare=0, $type='theater') {
+	$fields = array('mod','version',$type);
+	$fieldname = $ext = $type;
+	$suffix = ($compare) ? '_compare' : '';
+	$js = $vars = $data = array();
+
+	foreach ($fields as $field) {
+		switch ($field) {
+			case 'theater':
+				$fieldname = 'theaterfile';
+				break;
+			case 'map':
+			case 'cvarlist':
+			default:
+				$fieldname = $field;
+				break;
+		}
+		$data[$field] = 
+			($suffix) ?
+				(($GLOBALS["{$fieldname}{$suffix}"] == $GLOBALS[$fieldname]) ? '-' : $GLOBALS["{$fieldname}{$suffix}"]) :
+				$GLOBALS[$fieldname];
+		echo "{$field}: <select name='{$field}{$suffix}' id='{$field}{$suffix}'></select>\n";
+		$vars[$field] = $data[$field];
+		$jsf = ($field == $type) ? 'item' : $field;
+		$js[] = "var select_{$jsf}{$suffix} = \$('#{$field}{$suffix}');";
+		$js[] = "var cur_{$jsf}{$suffix} = '{$vars[$field]}';";
+	}
+
+	// If showing comparison options, put in blank as first entry to denote no comparison
+	if ($compare)
+		$vars['data']['-']['-']['-'] = '-';
 ?>
 <script type="text/javascript">
 jQuery(function($) {
-	var data = <?php echo prettyPrint(json_encode($vars['data'])); ?>;
+	var data = <?php echo prettyPrint(json_encode(GetModFiles($type))); ?>;
 	<?php echo implode("\n\t",$js)."\n"; ?>
 
 	$(select_mod).change(function () {
