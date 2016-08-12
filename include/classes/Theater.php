@@ -1,5 +1,212 @@
 <?php
 // Theater
+$base_theaters = array();
+
+// BEGIN theater
+// Populate $theaters array with all the theater files in the selected version
+$files = glob("{$datapath}/mods/{$mod}/{$version}/scripts/theaters/*.theater");
+foreach ($files as $file) {
+	if ((substr(basename($file),0,5) == "base_") || (substr(basename($file),-5,5) == "_base")) {
+		continue;
+	}
+	$theaters[] = basename($file,".theater");
+}
+// Add all custom theaters to the list, these do NOT depend on version, they will always be added
+foreach ($custom_theater_paths as $name => $path) {
+	if (file_exists($path)) {
+		$ctfiles = glob("{$path}/*.theater");
+		foreach ($ctfiles as $ctfile) {
+			$label = basename($ctfile,".theater");
+			$theaters[] = "{$name} {$label}";
+		}
+	}
+}
+
+// Default theater file to load if nothing is selected
+$theaterfile = "default";
+
+// If a theater is specified, find out if it's custom or stock, and set the path accordingly
+if (isset($_REQUEST['theater'])) {
+	if (strpos($_REQUEST['theater']," ")) {
+		$bits = explode(" ",$_REQUEST['theater'],2);
+		if (in_array($bits[0],array_keys($custom_theater_paths))) {
+			$theaterpath = $custom_theater_paths[$bits[0]];
+			$theaterfile = $bits[1];
+		}
+	} elseif (in_array($_REQUEST['theater'],$theaters)) {
+		$theaterfile = $_REQUEST['theater'];
+	}
+}
+// Comparison stuff
+$theaterfile_compare = $theaterfile;
+$theaterpath_compare = $theaterpath;
+if (isset($_REQUEST['theater_compare'])) {
+	if (strpos($_REQUEST['theater_compare']," ")) {
+		$bits = explode(" ",$_REQUEST['theater_compare'],2);
+		if (in_array($bits[0],array_keys($custom_theater_paths))) {
+			$theaterpath_compare = $custom_theater_paths[$bits[0]];
+			$theaterfile_compare = $bits[1];
+		}
+	} elseif (in_array($_REQUEST['theater_compare'],$theaters)) {
+		$theaterfile_compare = $_REQUEST['theater_compare'];
+	}
+}
+// END theater
+
+
+
+// stats functions
+/*
+multi_diff
+Compare two arrays recursively, return an array of differences
+Will be an array of differences (key structure identical to source arrays).
+Each element is an array that has two values, key is the nameX variable and value is the value from that source array
+Elements that are identical in both arrays are omitted
+Example:
+$array1 = array('object' => array('name' => 'object1', 'size' => 30, 'owner' => 'nobody'));
+$array2 = array('object' => array('name' => 'object2', 'size' => 40, 'owner' => 'nobody'));
+$result = multi_diff('array1',$array1,'array2',$array2);
+$result will be:
+array(
+	'object' => array(
+		'name' => array('array1' => 'object1','array2' => 'object2'),
+		'size' => array('array1' => 30,'array2' => 40)
+	)
+);
+*/
+function multi_diff($name1,$arr1,$name2,$arr2) {
+	$result = array();
+	$merged = $arr1+$arr2;// array_merge($arr1,$arr2);
+	foreach ($merged as $k=>$v){
+		if(!isset($arr2[$k])) {
+			$result[$k] = array($name1 => $arr1[$k], $name2 => NULL);
+		} else if(!isset($arr1[$k])) {
+			$result[$k] = array($name1 => NULL,$name2 => $arr2[$k]);
+		} else {
+			if(is_array($arr1[$k]) && is_array($arr2[$k])){
+				$diff = multi_diff($name1, $arr1[$k], $name2, $arr2[$k]);
+				if(!empty($diff)) {
+					$result[$k] = $diff;
+				}
+			} else if ($arr1[$k] !== $arr2[$k]) {
+				$result[$k] = array($name1 => $arr1[$k],$name2 => $arr2[$k]);
+			}
+		}
+	}
+	return $result;
+}
+/* ParseTheaterFile
+Takes a KeyValues file and parses it. If #base directives are included, pull those and merge contents on top
+*/
+function ParseTheaterFile($filename,$mod='',$version='',$path='',&$base_theaters=array(),$depth=0) {
+//var_dump("ParseTheaterFile",$filename,$mod,$version,$path,$base_theaters,$depth);
+	global
+		$custom_theater_paths,
+		$newest_version,
+		$latest_version,
+		$theaterpath,
+		$datapath,
+		$steam_ver,
+		$mods;
+	if ($version == '')
+		$version = $newest_version;
+	$basename = basename($filename);
+
+
+	if (file_exists($filename)) {
+		$filepath = $filename;
+	} else {
+		if (file_exists("{$path}/{$filename}")) {
+			$filepath = "{$path}/{$filename}";
+		} else {
+			$filepath = GetDataFile("scripts/theaters/{$basename}",$mod,$version);
+		}
+	}
+	$base_theaters[$basename] = md5($filepath);
+
+	$sniproot = "${GLOBALS['rootpath']}/theaters/snippets/";
+	$snipfile = str_replace($sniproot,"",$filepath);
+	if ($snipfile != $filepath) {
+		$cachefile = "theaters/snippets/".str_replace("/","_","{$snipfile}");
+//var_dump($sniproot,$snipfile,$snippath,$cachefile);
+	} else {
+		$cachefile = "theaters/{$mod}/{$version}/{$basename}";
+	}
+	// Attempt to load file from cache
+	$cachedata = GetCacheFile($cachefile);
+	if (isset($cachedata['base'])) {
+		// Check all files for MD5
+		foreach ($cachedata['base'] as $file => $md5) {
+			if ($file == $basename) {
+				$filemd5 = $base_theaters[$basename];
+			} else {
+				$bfpath = GetDataFile("scripts/theaters/{$file}",$mod,$version);
+				$filemd5 = md5($bfpath);
+			}
+			// If a component file is modified, do not use the cache.
+			if ($filemd5 != $md5) {
+//var_dump("md5 no match for {$file} - {$filemd5} != {$md5}");
+				$cachedata['theater'] = '';
+				break;
+			}
+		}
+	}
+	if (!is_array($cachedata['theater'])) {
+//var_dump("processing {$filename}");
+		// Load raw theater file
+		$data = file_get_contents($filepath);
+
+		// Parse KeyValues data
+		$thisfile = parseKeyValues($data);
+//var_dump($thisfile);
+		// Get theater array
+		// If the theater sources another theater, process them in order using a merge which blends sub-array values from bottom to top, recursively replacing.
+		// This appears to be the way the game processes these files it appears.
+		if (isset($thisfile["#base"])) {
+			$basedata = array();
+			// Create an array of base files
+			if (is_array($thisfile["#base"])) {
+				$bases = $thisfile["#base"];
+			} else {
+				$bases = array($thisfile["#base"]);
+			}
+			// Merge all base files into basedata array
+			foreach ($bases as $base) {
+//var_dump("base {$base}");
+				$base_file = GetDataURL("scripts/theaters/{$base}",$mod,$version);
+				$cachedata['base'][$base] = md5($base_file);
+				if (in_array($base,array_keys($base_theaters)) === true)
+					continue;
+				$base_theaters[$base] = $cachedata['base'][$base];
+//var_dump("processing base {$base}");
+				$basedata = array_merge_recursive(ParseTheaterFile($base,$mod,$version,$path,$base_theaters,$depth+1),$basedata);
+			}
+			// Merge this theater on top of combined base
+			$cachedata['theater'] = theater_array_replace_recursive($basedata,$thisfile['theater']);
+		} else {
+			$cachedata['theater'] = $thisfile["theater"];
+		}
+/*
+		// Include parts that might be conditional in their parents, basically put everything in flat arrays
+		// This isn't congruent with how the game handles them, I believe this ougght to be a selector in the UI that can handle this better
+		foreach ($cachedata['theater'] as $sec => $data) {
+			foreach ($data as $key => $val) {
+				if (($key[0] == '?') && (is_array($val))) {
+					unset($cachedata['theater'][$sec][$key]);
+					$cachedata['theater'][$sec] = $val;// theater_array_replace_recursive($cachedata['theater'][$sec],$val);
+				}
+			}
+		}
+*/
+		// Save cache data
+//var_dump($cachedata);
+		PutCacheFile($cachefile,$cachedata);
+	}
+	// Send back theater object
+	return $cachedata['theater'];
+}
+
+
 $snippets = array();
 $sections = array();
 $snippet_path = "{$rootpath}/theaters/snippets";
