@@ -1,3 +1,7 @@
+---
+bspsrc_path: "../../thirdparty/bspsrc/bspsrc.jar"
+do_maps: false
+do_vpks: true
 extract_paths:
   "maps/": "*.txt"
   "materials/overviews/": "*"
@@ -11,12 +15,20 @@ extract_paths:
   "resource/": "*.res"
   "scripts/playlists/": "*.txt"
   "scripts/theaters/": "*.theater"
-extract_root: "/home/insserver/insurgency-tools/data/mods"
+extract_root: "../../data/mods"
+game_roots:
+  - "/home/doiserver/serverfiles"
+  - "/home/insserver/serverfiles"
+  - "~/serverfiles"
+  - "~/Library/Application\ Support/Steam/steamapps/common"
 games:
-  "doi":
-    game_root: "/home/doiserver/serverfiles/doi"
+  "dayofinfamy":
+    game_dir: "doi"
   "insurgency":
-    game_root: "/home/insserver/serverfiles/insurgency"
+    game_name: "insurgency2"
+    game_dir: "insurgency"
 vpk_files:
   - "misc"
   - "materials"
+vtf2tga_path: "../../utilities/vtf2tga/vtf2tga"
+...
