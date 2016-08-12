@@ -1,0 +1,22 @@
+extract_paths:
+  "maps/": "*.txt"
+  "materials/overviews/": "*"
+  "materials/vgui/gameui/": "*"
+  "materials/vgui/hud/": "*"
+  "materials/vgui/hud_doi/": "*"
+  "materials/vgui/inventory/": "*"
+  "materials/vgui/logos/": "*"
+  "materials/vgui/maps/": "*"
+  "resource/": "*.txt"
+  "resource/": "*.res"
+  "scripts/playlists/": "*.txt"
+  "scripts/theaters/": "*.theater"
+extract_root: "/home/insserver/insurgency-tools/data/mods"
+games:
+  "doi":
+    game_root: "/home/doiserver/serverfiles/doi"
+  "insurgency":
+    game_root: "/home/insserver/serverfiles/insurgency"
+vpk_files:
+  - "misc"
+  - "materials"
