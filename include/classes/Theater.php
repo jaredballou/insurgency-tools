@@ -1,60 +1,4 @@
 <?php
-// Theater
-$base_theaters = array();
-
-// BEGIN theater
-// Populate $theaters array with all the theater files in the selected version
-$files = glob("{$datapath}/mods/{$mod}/{$version}/scripts/theaters/*.theater");
-foreach ($files as $file) {
-	if ((substr(basename($file),0,5) == "base_") || (substr(basename($file),-5,5) == "_base")) {
-		continue;
-	}
-	$theaters[] = basename($file,".theater");
-}
-// Add all custom theaters to the list, these do NOT depend on version, they will always be added
-foreach ($custom_theater_paths as $name => $path) {
-	if (file_exists($path)) {
-		$ctfiles = glob("{$path}/*.theater");
-		foreach ($ctfiles as $ctfile) {
-			$label = basename($ctfile,".theater");
-			$theaters[] = "{$name} {$label}";
-		}
-	}
-}
-
-// Default theater file to load if nothing is selected
-$theaterfile = "default";
-
-// If a theater is specified, find out if it's custom or stock, and set the path accordingly
-if (isset($_REQUEST['theater'])) {
-	if (strpos($_REQUEST['theater']," ")) {
-		$bits = explode(" ",$_REQUEST['theater'],2);
-		if (in_array($bits[0],array_keys($custom_theater_paths))) {
-			$theaterpath = $custom_theater_paths[$bits[0]];
-			$theaterfile = $bits[1];
-		}
-	} elseif (in_array($_REQUEST['theater'],$theaters)) {
-		$theaterfile = $_REQUEST['theater'];
-	}
-}
-// Comparison stuff
-$theaterfile_compare = $theaterfile;
-$theaterpath_compare = $theaterpath;
-if (isset($_REQUEST['theater_compare'])) {
-	if (strpos($_REQUEST['theater_compare']," ")) {
-		$bits = explode(" ",$_REQUEST['theater_compare'],2);
-		if (in_array($bits[0],array_keys($custom_theater_paths))) {
-			$theaterpath_compare = $custom_theater_paths[$bits[0]];
-			$theaterfile_compare = $bits[1];
-		}
-	} elseif (in_array($_REQUEST['theater_compare'],$theaters)) {
-		$theaterfile_compare = $_REQUEST['theater_compare'];
-	}
-}
-// END theater
-
-
-
 // stats functions
 /*
 multi_diff
@@ -173,10 +117,10 @@ function ParseTheaterFile($filename,$mod='',$version='',$path='',&$base_theaters
 			// Merge all base files into basedata array
 			foreach ($bases as $base) {
 //var_dump("base {$base}");
-				$base_file = GetDataURL("scripts/theaters/{$base}",$mod,$version);
-				$cachedata['base'][$base] = md5($base_file);
 				if (in_array($base,array_keys($base_theaters)) === true)
 					continue;
+				$base_file = GetDataURL("scripts/theaters/{$base}",$mod,$version);
+				$cachedata['base'][$base] = md5($base_file);
 				$base_theaters[$base] = $cachedata['base'][$base];
 //var_dump("processing base {$base}");
 				$basedata = array_merge_recursive(ParseTheaterFile($base,$mod,$version,$path,$base_theaters,$depth+1),$basedata);
@@ -206,10 +150,6 @@ function ParseTheaterFile($filename,$mod='',$version='',$path='',&$base_theaters
 	return $cachedata['theater'];
 }
 
-
-$snippets = array();
-$sections = array();
-$snippet_path = "{$rootpath}/theaters/snippets";
 
 // theater_recurse - 
 function theater_recurse($array, $array1)

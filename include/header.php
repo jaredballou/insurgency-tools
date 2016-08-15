@@ -49,6 +49,8 @@ if (!isset($title)) {
 </script>
 <?php
 
+/*
+// jballou - disabled 2016-08-15 as it is unused
 $js_files = array(
 	'fusioncharts.js',
 	'fusioncharts.jqueryplugin.js',
@@ -56,7 +58,7 @@ $js_files = array(
 foreach ($js_files as $js_file) {
 	echo "<script type='text/javascript' src='{$GLOBALS['urlbase']}include/{$js_file}'></script>\n";
 }
-
+*/
 function startbody() {
 	global $curpage,$pages,$includepath;
 	echo "  </head>\n  <body>\n";

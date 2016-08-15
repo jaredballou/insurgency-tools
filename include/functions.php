@@ -8,7 +8,7 @@ $includepath = realpath(dirname(__FILE__));
 // rootpath is the insurgency-tools root
 $rootpath=dirname($includepath);
 
-
+$command = isset($_REQUEST['command']) ? $_REQUEST['command'] : "";
 // Pull in configuration settings
 include "{$includepath}/config.php";
 
@@ -308,12 +308,11 @@ Get the material path
 */
 function GetMaterial($name,$type='img',$path='') {
 	// This is shit path munging, fix it
-	$pathparts = array_filter(array_merge(explode("/",preg_replace('/\.(vmt|vtf|png)$/','',"{$path}/{$name}"))));
+	$pathparts = array_values(array_filter(array_merge(explode("/",preg_replace('/\.(vmt|vtf|png)$/','',"{$path}/{$name}")))));
 	if ($pathparts[0] != 'materials') {
 		array_unshift($pathparts,'materials');
 	}
 	$filepath = implode("/",$pathparts);
-
 	// If we have a PNG, just send it
 	if (file_exists(GetDataFile("{$filepath}.png"))) {
 		return GetDataURL("{$filepath}.png");
@@ -477,3 +476,129 @@ $files = glob("{$includepath}/classes/*");
 foreach ($files as $file) {
 	require_once($file);
 }
+
+
+// Post Class include global code - all of this is shit and needs to be fixed!
+
+//BEGIN mods
+$mods = LoadMods("{$datapath}/mods");
+// Set version and newest_version to the latest one. Try to get the version from Steam, otherwise just choose the newest available.
+ksort($mods);
+
+// Default mod
+$mod="insurgency";
+
+// If mod in request is valid, use it
+if (isset($_REQUEST['mod'])) {
+	if (isset($mods[$_REQUEST['mod']])) {
+		$mod = $_REQUEST['mod'];
+	}
+}
+
+// Set mod_compare to our mod now that we have handled user input.
+// These two need to be identical if we're not doing the mod compare dump command
+$mod_compare = $mod;
+if (isset($_REQUEST['mod_compare'])) {
+	if (isset($mods[$mod][$_REQUEST['mod_compare']])) {
+		$mod_compare = $_REQUEST['mod_compare'];
+	}
+}
+// END mods
+
+
+
+//BEGIN version
+
+$steam_ver=getSteamVersion();
+$newest_version = $version = isset($mods[$mod][$steam_ver]) ? $steam_ver : end(array_keys($mods[$mod]));
+
+// If version sent by request, set it as the version if it's valid.
+if (isset($_REQUEST['version'])) {
+	if (isset($mods[$mod][$_REQUEST['version']])) {
+		$version = $_REQUEST['version'];
+	}
+}
+
+// Set version_compare to our version now that we have handled user input.
+// These two need to be identical if we're not doing the version compare dump command
+$version_compare = $version;
+if (isset($_REQUEST['version_compare'])) {
+	if (isset($mods[$mod][$_REQUEST['version_compare']])) {
+		$version_compare = $_REQUEST['version_compare'];
+	}
+}
+//END version
+
+if (isset($_REQUEST['language'])) {
+	if (in_array($_REQUEST['language'],$lang)) {
+		$language = $_REQUEST['language'];
+	}
+}
+// Loading languages here because we are only loading the core language at this time
+LoadLanguages($language);
+$gamemodes = array();
+$raw = preg_grep('/^[\#]*game_gm_(.*)$/', array_keys($lang[$language]));
+foreach ($raw as $key) {
+	$bits = explode("_",$key,3);
+	$gm = $bits[2];
+	$gamemodes[$gm]['name'] = @$lang[$language][$key];
+	$gamemodes[$gm]['desc'] = @$lang[$language]["#game_description_{$gm}"];
+	$gamemodes[$gm]['desc_short'] = @$lang[$language]["#game_description_short_{$gm}"];
+}
+
+// Theater
+$snippets = array();
+$sections = array();
+$snippet_path = "{$rootpath}/theaters/snippets";
+$base_theaters = array();
+
+// BEGIN theater
+// Populate $theaters array with all the theater files in the selected version
+$files = glob("{$datapath}/mods/{$mod}/{$version}/scripts/theaters/*.theater");
+foreach ($files as $file) {
+	if ((substr(basename($file),0,5) == "base_") || (substr(basename($file),-5,5) == "_base")) {
+		continue;
+	}
+	$theaters[] = basename($file,".theater");
+}
+// Add all custom theaters to the list, these do NOT depend on version, they will always be added
+foreach ($custom_theater_paths as $name => $path) {
+	if (file_exists($path)) {
+		$ctfiles = glob("{$path}/*.theater");
+		foreach ($ctfiles as $ctfile) {
+			$label = basename($ctfile,".theater");
+			$theaters[] = "{$name} {$label}";
+		}
+	}
+}
+
+// Default theater file to load if nothing is selected
+$theaterfile = "default";
+
+// If a theater is specified, find out if it's custom or stock, and set the path accordingly
+if (isset($_REQUEST['theater'])) {
+	if (strpos($_REQUEST['theater']," ")) {
+		$bits = explode(" ",$_REQUEST['theater'],2);
+		if (in_array($bits[0],array_keys($custom_theater_paths))) {
+			$theaterpath = $custom_theater_paths[$bits[0]];
+			$theaterfile = $bits[1];
+		}
+	} elseif (in_array($_REQUEST['theater'],$theaters)) {
+		$theaterfile = $_REQUEST['theater'];
+	}
+}
+// Comparison stuff
+$theaterfile_compare = $theaterfile;
+$theaterpath_compare = $theaterpath;
+if (isset($_REQUEST['theater_compare'])) {
+	if (strpos($_REQUEST['theater_compare']," ")) {
+		$bits = explode(" ",$_REQUEST['theater_compare'],2);
+		if (in_array($bits[0],array_keys($custom_theater_paths))) {
+			$theaterpath_compare = $custom_theater_paths[$bits[0]];
+			$theaterfile_compare = $bits[1];
+		}
+	} elseif (in_array($_REQUEST['theater_compare'],$theaters)) {
+		$theaterfile_compare = $_REQUEST['theater_compare'];
+	}
+}
+// END theater

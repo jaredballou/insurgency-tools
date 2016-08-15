@@ -48,7 +48,7 @@ if (isset($_REQUEST['mod'])) {
 
 // Select version
 $version = end(array_keys($lists[$mod]));
-if ($_REQUEST['version']) {
+if (isset($_REQUEST['version'])) {
 	if (in_array($_REQUEST['version'],array_keys($lists[$mod]))) {
 		$version = $_REQUEST['version'];
 	}
@@ -56,7 +56,7 @@ if ($_REQUEST['version']) {
 
 // Select list type
 $cvarlist = end($lists[$mod][$version]);
-if ($_REQUEST['cvarlist']) {
+if (isset($_REQUEST['cvarlist'])) {
 	if (in_array($_REQUEST['cvarlist'],array_keys($lists[$mod][$version]))) {
 		$cvarlist = $_REQUEST['cvarlist'];
 	}
@@ -64,7 +64,7 @@ if ($_REQUEST['cvarlist']) {
 
 $data = GetCVARList($mod,$version,$cvarlist);
 
-if ($_REQUEST['fetch'] == 'list') {
+if (isset($_REQUEST['fetch']) && $_REQUEST['fetch'] == 'list') {
 	header('Content-Type: application/json');
 	echo prettyPrint(json_encode($data));
 	exit;
@@ -91,7 +91,7 @@ function DisplayCVARList($data) {
 	foreach (array_keys(current($data)) as $field) {
 		$header.="<th>{$field}</th>";
 	}
-	if ($_REQUEST['command'] == 'Dump Config') {
+	if ($GLOBALS['command'] == 'Dump Config') {
 		echo "<textarea cols='80' rows='40'>\n";
 		echo CreateConfigFromCVARList($data);
 		echo "</textarea>\n";

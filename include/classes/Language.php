@@ -1,14 +1,11 @@
 <?php
+if (!isset($lang))
+	$lang = array();
 
-if (isset($_REQUEST['language'])) {
-	if (in_array($_REQUEST['language'],$lang)) {
-		$language = $_REQUEST['language'];
-	}
-}
 // LoadLanguages - Load all the language files from the data directory
 // Also loads the language codes from SourceMod (also in data directory)
 function LoadLanguages($pattern='English') {
-	global $langcode, $lang,$rootpath,$command,$datapath,$mod,$version;
+	global $langcode,$lang,$rootpath,$command,$datapath,$mod,$version;
 	if (!isset($langcode))
 		$langcode = array();
 	if (!isset($lang))
@@ -30,6 +27,7 @@ function LoadLanguages($pattern='English') {
 
 	// Load all language files
 	$langfiles = GetDataFiles("resource/*_".strtolower($pattern).".txt");
+//var_dump($langfiles);
 	foreach ($langfiles as $langfile) {
 		$data = trim(preg_replace($langfile_regex, '', file_get_contents($langfile)));
 		$data = parseKeyValues($data,false);
@@ -49,16 +47,5 @@ function LoadLanguages($pattern='English') {
 			}
 		}
 	}
+//var_dump($lang);
 }
-// Loading languages here because we are only loading the core language at this time
-LoadLanguages($language);
-$gamemodes = array();
-$raw = preg_grep('/^[\#]*game_gm_(.*)$/', array_keys($lang[$language]));
-foreach ($raw as $key) {
-	$bits = explode("_",$key,3);
-	$gm = $bits[2];
-	$gamemodes[$gm]['name'] = @$lang[$language][$key];
-	$gamemodes[$gm]['desc'] = @$lang[$language]["#game_description_{$gm}"];
-	$gamemodes[$gm]['desc_short'] = @$lang[$language]["#game_description_short_{$gm}"];
-}
-

@@ -32,7 +32,7 @@ foreach ($files as $file) {
 	$maps[$mapname] = json_decode(file_get_contents($file),true);
 }
 
-if ($_REQUEST['command'] == 'hlstats') {
+if ($command == 'hlstats') {
 	echo "<pre>\n";
 	$dbprefix = $_REQUEST['dbprefix'] ? $_REQUEST['dbprefix'] : 'hlstats';
 	$tables = array(
@@ -60,7 +60,7 @@ if ($_REQUEST['command'] == 'hlstats') {
 	}
 	exit;
 }
-if ($_REQUEST['command'] == 'symlinks') {
+if ($command == 'symlinks') {
 	echo "<pre>\n";
 	echo "#!/bin/bash\n";
 	foreach ($maps as $mapname => $mapdata) {
@@ -72,7 +72,7 @@ if ($_REQUEST['command'] == 'symlinks') {
 	}
 	exit;
 }
-if ($_REQUEST['command'] == 'mapcycle') {
+if ($command == 'mapcycle') {
 	$maps = array();
 	$maplist = array();
 	$mapfiles = GetDataFiles("maps/*.txt",'*','*');
@@ -519,7 +519,7 @@ function GetEntities($map,$gtname,$names='',$classnames='',$max=-1) {
 }
 
 // Display map if selected
-if ($map) {
+if (isset($map)) {
 	// Load gametype data
 	$gametypes = array_keys($maps[$map]['gametypes']);
 
@@ -791,7 +791,7 @@ Map: <select name='map'>";
 	echo "</select>\n";
 */
 	echo "<input type='submit' value='Go'></form>\n";
-if ($map) {
+if (isset($map)) {
 ?>
 						<h2>MAP OVERLAYS</h2>
 						<form><input id='gametypes' type='button' value='ON' onclick="toggleButton(this)" />
@@ -834,7 +834,7 @@ echo "		</form>\n";
  Within quotes, separated by comma.
  E.g.:	 ['imgid', 'divid'];
 */
-var elmids = ['map-image','grid-overlay','navmesh-overlay','heatmap-overlay'<?php if (count($layers)) { echo ",'svg-".implode("','svg-",$layers)."'"; } ?>];
+var elmids = ['map-image','grid-overlay','navmesh-overlay','heatmap-overlay'<?php if (isset($layers) && count($layers)) { echo ",'svg-".implode("','svg-",$layers)."'"; } ?>];
 
 var x, y = 0; // variables that will contain the coordinates
 
