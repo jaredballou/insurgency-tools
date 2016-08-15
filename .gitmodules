@@ -10,3 +10,9 @@
 	path = thirdparty
 	url = git@github.com:jaredballou/insurgency-thirdparty.git
 	branch = master
+[submodule "utilities/python/gamedata"]
+	path = utilities/python/gamedata
+	url = git@github.com:jaredballou/python-gamedata.git
+[submodule "utilities/python/vdf"]
+	path = utilities/python/vdf
+	url = git@github.com:jaredballou/vdf.git
