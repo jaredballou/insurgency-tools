@@ -1,5 +1,8 @@
 ---
-bspsrc_path: "../../thirdparty/bspsrc/bspsrc.jar"
+tools:
+  bspsrc: "../../thirdparty/bspsrc/bspsrc.jar"
+  pakrat: "../../thirdparty/pakrat/pakrat.jar"
+  vtf2tga: "../../utilities/vtf2tga/vtf2tga"
 do_maps: false
 do_vpks: true
 extract_paths:
@@ -11,8 +14,7 @@ extract_paths:
   "materials/vgui/inventory/": "*"
   "materials/vgui/logos/": "*"
   "materials/vgui/maps/": "*"
-  "resource/": "*.txt"
-  "resource/": "*.res"
+  "resource/": "*.txt *.res"
   "scripts/playlists/": "*.txt"
   "scripts/theaters/": "*.theater"
 extract_root: "../../data/mods"
@@ -30,5 +32,4 @@ games:
 vpk_files:
   - "misc"
   - "materials"
-vtf2tga_path: "../../utilities/vtf2tga/vtf2tga"
 ...
