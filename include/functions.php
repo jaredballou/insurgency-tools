@@ -21,15 +21,14 @@ include "{$includepath}/config.php";
 //parseLibPath();
 
 if ($cache_method == "phpFastCache") {
-	use phpFastCache\CacheManager;
 	//require_once("phpfastcache/phpfastcache.php");
 	//phpFastCache::setup
-	CacheManager::setup(array(
+	phpFastCache\CacheManager::setup(array(
 		"path"		=> $cachepath,
 		"allow_search"	=> true,
 	));
-	CacheManager::CachingMethod("phpfastcache");
-	$cache = CacheManager::Files();
+	phpFastCache\CacheManager::CachingMethod("phpfastcache");
+	$cache = phpFastCache\CacheManager::Files();
 
 	//new phpFastCache("files");
 	//$cache->driver_set('path',$cachepath);
