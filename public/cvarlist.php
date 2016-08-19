@@ -160,21 +160,20 @@ function GetCVARList($mod,$version,$cvarlist) {
 }
 
 function CreateConfigFromCVARList($data) {
-	$str='';
+	$lines = array();
 	foreach ($data as $row) {
-		$prefix = '';
 		if ($row['Value'] == 'cmd')
 			continue;
+		$line="{$row['Name']} \"{$row['Value']}\"";
 		if ($row['Help Text'] || $row['CHEAT']) {
-			$help = " //{$row['Help Text']}";
+			$line.= " //{$row['Help Text']}";
 			if ($row['CHEAT']) {
-				$prefix = 'sm_cvar ';
-				$help.=" CHEAT";
+				$line = "sm_cvar {$line} CHEAT";
 			}
 		}
-		$str.="{$prefix}{$row['Name']} \"{$row['Value']}\"{$help}\n";
+		$lines[] = $line;
 	}
-	return $str;
+	return implode("\n",$lines);
 }
 
 ?>
