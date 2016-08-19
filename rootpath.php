@@ -9,7 +9,10 @@
 */
 // rootpath is the insurgency-tools root
 $rootpath = realpath(dirname(__FILE__));
-require_once("{$rootpath}/vendor/autoload.php");
+$autoload_path = "{$rootpath}/vendor/autoload.php";
+if (file_exists($autoload_path)) {
+	require_once($autoload_path);
+}
 
 // includepath is the include directory
 $includepath = "${rootpath}/include";
