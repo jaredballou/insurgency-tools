@@ -1,0 +1,46 @@
+---
+do_maps: true
+do_materials: true
+do_vpks: true
+extract_paths:
+  "maps/": "*.txt"
+  "materials/overviews/": "*"
+  "materials/vgui/gameui/": "*"
+  "materials/vgui/hud/": "*"
+  "materials/vgui/hud_doi/": "*"
+  "materials/vgui/inventory/": "*"
+  "materials/vgui/logos/": "*"
+  "materials/vgui/maps/": "*"
+  "resource/": "*.txt *.res"
+  "scripts/playlists/": "*.playlist"
+  "scripts/theaters/": "*.theater"
+extract_root: "../../data/mods"
+game_roots:
+  - "/home/doiserver/serverfiles"
+  - "/home/insserver/serverfiles"
+  - "~/serverfiles"
+  - "~/Library/Application\ Support/Steam/steamapps/common"
+games:
+  "dayofinfamy":
+    game_dir: "doi"
+  "insurgency":
+    game_name: "insurgency2"
+    game_dir: "insurgency"
+map_files:
+  bsp: "maps/%(name)s.bsp"
+  nav: "maps/%(name)s.nav"
+  cpsetup_txt: "maps/%(name)s.txt"
+  json: "maps/parsed/%(name)s.json"
+  vmf: "maps/src/%(name)s_d.vmf"
+  overview_txt: "resource/overviews/%(name)s.txt"
+  overview_vmt: "materials/overviews/%(name)s.vmt"
+  overview_vtf: "materials/overviews/%(name)s.vtf"
+  overview_png: "materials/overviews/%(name)s.png"
+tools:
+  bspsrc: "../../thirdparty/bspsrc/bspsrc.jar"
+  pakrat: "../../thirdparty/pakrat/pakrat.jar"
+  vtf2tga: "../../utilities/vtf2tga/vtf2tga"
+vpk_files:
+  - "misc"
+  - "materials"
+...
