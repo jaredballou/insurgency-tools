@@ -20,25 +20,21 @@ include "{$includepath}/config.php";
 // Load custom library paths for include
 //parseLibPath();
 
-use phpFastCache\CacheManager;
-//require_once("phpfastcache/phpfastcache.php");
-//phpFastCache::setup
+if ($cache_method == "phpFastCache") {
+	use phpFastCache\CacheManager;
+	//require_once("phpfastcache/phpfastcache.php");
+	//phpFastCache::setup
+	CacheManager::setup(array(
+		"path"		=> $cachepath,
+		"allow_search"	=> true,
+	));
+	CacheManager::CachingMethod("phpfastcache");
+	$cache = CacheManager::Files();
 
-
-
-CacheManager::setup(array(
-	"path"		=> $cachepath,
-	"allow_search"	=> true,
-));
-CacheManager::CachingMethod("phpfastcache");
-
-
-$cache = CacheManager::Files();
-
-//new phpFastCache("files");
-//$cache->driver_set('path',$cachepath);
-//$cache->driver_set('securitykey','cache.folder');
-
+	//new phpFastCache("files");
+	//$cache->driver_set('path',$cachepath);
+	//$cache->driver_set('securitykey','cache.folder');
+}
 // Create cache dir if needed
 if (!file_exists($cachepath)) {
 	mkdir($cachepath,0755,true);
@@ -221,41 +217,45 @@ function FormatCacheFileName($filename,$format='json') {
 }
 
 function PutCacheFile($filename,$data,$format='json') {
-	global $cache;
-	$cache->set($filename,$data,0);
-/*
-	$path = FormatCacheFileName($filename,$format);
-	switch ($format) {
-		case 'json':
-			if (is_array($data) || is_object($data)) {
-				$data = prettyPrint(json_encode($data));
-			}
-			break;
+	global $cache_method;
+	if ($cache_method == "phpFastCache") {
+		global $cache;
+		$cache->set($filename,$data,0);
+	} else {
+		$path = FormatCacheFileName($filename,$format);
+		switch ($format) {
+			case 'json':
+				if (is_array($data) || is_object($data)) {
+					$data = prettyPrint(json_encode($data));
+				}
+				break;
+		}
+		if (!file_exists(dirname($path))) {
+			mkdir(dirname($path),0755,true);
+		}
+		file_put_contents($path,$data);
 	}
-	if (!file_exists(dirname($path))) {
-		mkdir(dirname($path),0755,true);
-	}
-	file_put_contents($path,$data);
-*/
 }
 
 function GetCacheFile($filename,$format='json') {
-	global $cache;
-	$data = $cache->get($filename);
-	return $data;
-	if (is_null($data)) {
-	}
-	$path = FormatCacheFileName($filename,$format);
-	if (!file_exists($path)) {
-		return;
-	}
-	switch ($format) {
-		case 'json':
-			$data = json_decode(file_get_contents($path),true);
-			break;
-	}
-	if (isset($data)) {
+	global $cache_method;
+	if ($cache_method == "phpFastCache") {
+		global $cache;
+		$data = $cache->get($filename);
 		return $data;
+	} else {
+		$path = FormatCacheFileName($filename,$format);
+		if (!file_exists($path)) {
+			return;
+		}
+		switch ($format) {
+			case 'json':
+				$data = json_decode(file_get_contents($path),true);
+				break;
+		}
+		if (isset($data)) {
+			return $data;
+		}
 	}
 }
 

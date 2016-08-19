@@ -135,6 +135,8 @@ $hlstatsx_config = "{$hlstatsx_root}/heatmaps/config.inc.php";
 // Cache directory to stash temporary files. This should be inaccessible via your Web server!
 $cachepath = "{$rootpath}/cache";
 
+// Cache method. Options are: "json", "phpFastCache"
+$cache_method = "json";
 
 // Old versions and maps that I just don't want in the list
 // New system is to use 
