@@ -23,6 +23,7 @@ function DisplayStatsHeader($startbody=1) {
 	// Mod/version/theater
 	echo "<div>\n";
 	DisplayModSelection();
+	DisplayTheaterConditions();
 	// Comparison Mod/version/theater
 	echo "<div class='beta' style='float: right;'><b>Compare to another theater:</b> \n";
 	DisplayModSelection(1);

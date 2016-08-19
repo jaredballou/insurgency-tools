@@ -72,27 +72,44 @@ function filterTheaterPath ($val) {
 	return ($val[0] != '?' && $val != '');
 }
 
-function matchTheaterPath($paths,$matches) {
+// Take two lists of paths to match. Return the first element from matches that matches the first path that finds one.
+function matchTheaterPath($paths, $matches) {
 	if (!is_array($paths)) {
 		$paths=array($paths);
 	}
+	if (!is_array($matches)) {
+		$matches=array($matches);
+	}
+	// Loop over each path to match
 	foreach ($paths as $path) {
-		$path_parts = array_filter(explode("/",$path), 'filterTheaterPath');
+		//$path_parts = array_filter(explode("/",$path), 'filterTheaterPath');
+		$path_parts = explode("/",$path);
+		// Check each match for this path
 		foreach ($matches as $match) {
-			$match_parts = array_filter(explode("/",$match), 'filterTheaterPath');
+			$match_parts = explode("/",$match);
+			//$match_parts = array_filter(explode("/",$match), 'filterTheaterPath');
+			// If the number of elements differs, this cannot be a match.
+			// NB: To match subkeys of a tree, use multiple wildcards like /theater/player_templates/*/*/*
 			if (count($match_parts) != count($path_parts)) {
 				continue;
 			}
-			foreach ($match_parts as $idx=>$part) {
-				if (($part != $path_parts[$idx]) && ($part != '*')) {
+			// Compare each element of both paths
+			foreach ($match_parts as $mid=>$mpart) {
+				// Strip conditionals from each element to compare
+				$mpart = array_shift(explode("?",$mpart));
+				$ppart = array_shift(explode("?",$path_parts[$mid]));
+				// If this element does not match, and neither element is a wildcard, stop checking this match
+				if (($mpart != $ppart) && ($ppart != '*') && ($mpart != '*')) {
 					continue 2;
 				}
-				if (($idx+1) == count($match_parts)) {
+				// If this is the last element to check, then the match is returned
+				if (($mid+1) == count($match_parts)) {
 					return $match;
 				}
 			}
 		}
 	}
+	// Nothing matched, return false
 	return false;
 }
 
@@ -149,6 +166,12 @@ function parseKeyValues($KVString,$fixquotes=true,$debug=false)
 					// EDIT: Use quoteWhat as a qualifier rather than quoteValue in case we have a "" value
 					if (strlen($quoteKey) && ($quoteWhat == "value"))
 					{
+						// If this is a top-level child of a conditional, append condition to quoteKey.
+						if (($path == $conditional_path) && ($conditional)) {
+							//var_dump("This is it", $conditional, $conditional_path, $quoteKey, $tree);
+							$quoteKey = "{$quoteKey}{$conditional}";
+						}
+
 						if ($sequential) {
 							if (!$allowdupes) {
 								// Check to make sure this value does not already exist
@@ -186,11 +209,8 @@ function parseKeyValues($KVString,$fixquotes=true,$debug=false)
 						$quoteKey = "";
 						$quoteValue = "";
 					}
-					
-					if ($quoteWhat == "key")
-						$quoteWhat = "value";
-					else if ($quoteWhat == "value")
-						$quoteWhat = "key";
+					// Toggle key or value tracking
+					$quoteWhat = ($quoteWhat == "key") ? "value" : "key";
 				}
 				$isInQuote = !$isInQuote;
 				break;
@@ -198,34 +218,37 @@ function parseKeyValues($KVString,$fixquotes=true,$debug=false)
 			case "{":
 				$commentLines=1;
 				if (strlen($quoteKey)) {
+					// If this key begins with a "?", process it as a conditional
+					// NB: This does not handle nested conditionals. It will shit itself.
 					if (substr($quoteKey,0,1) == '?') {
 						$conditional=$quoteKey;
-						$conditional_path=$path;
+						$theater_conditions[$conditional][] = $conditional_path = $path;
 					} else {
+						// If this is a top level child of a theater conditional, append the conditional to the key name.
+						if ((implode("/",$tree) == $conditional_path) && ($conditional)) {
+							//var_dump("This is it", $conditional, $conditional_path, $quoteKey, $tree);
+							$quoteKey = "{$quoteKey}{$conditional}";
+						}
+						// Update path in tree
 						// Add key to tree
 						$tree[] = $quoteKey;
-						// Update path in tree
+						// Update path
 						$path = implode("/",$tree);
-						if ($conditional) {
-							$theater_conditions[$conditional][] = $path;
-						}
+//						if ($conditional) {
+//							$theater_conditions[$conditional_path][$conditional][] = $path;
+//						}
 						$sequential = matchTheaterPath($path,$ordered_fields);
 						if ((!$sequential_path) && ($sequential)) {
 							$sequential_path = $path;
-//							echo "sequential {$sequential} path {$path} sequential_path {$sequential_path}\n";
 						}
 						if (!$allowdupes) {
-//							echo "test allowdupes\n";
 							$allowdupes = matchTheaterPath($path,$allow_duplicates_fields);
-//							echo "allowdupes {$allowdupes}\n";
 						}
 						// Update parents array with current pointer in the new path location
 						$parents[$path] = &$ptr;
 
 						// If the object already exists, create an array of objects
-						if ($quoteKey[0] == '?') {
-							$ptr = &$ptr[][$quoteKey];
-						} elseif (isset($ptr[$quoteKey])) {
+						if (isset($ptr[$quoteKey])) {
 							// Get all the keys, this assumes that the data will have non-numeric keys.
 							$keys = implode('',array_keys($ptr[$quoteKey]));
 							// So when we see non-numeric keys, we push the existing data into an array of itself before appending the next object.
@@ -254,12 +277,9 @@ function parseKeyValues($KVString,$fixquotes=true,$debug=false)
 					$sequential='';
 					if ($path == $allowdupes) {
 						$allowdupes='';
-//						echo "done allowdupes\n";
 					}
 					if ($sequential) {
-//						echo "} sequential {$sequential} path {$path} sequential_path {$sequential_path}\n";
 						if ($path == $sequential_path) {
-//							echo "unset\n";
 							$sequential_path='';
 						}
 

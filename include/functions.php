@@ -83,49 +83,6 @@ function getRelativePath($base, $path) {
 	return $separator.implode($separator, array_slice($path, count($base)));
 }
 
-// BEGIN range
-// Units of measurement
-$range_units = array(
-	'U' => 'Game Units',
-	'M' => 'Meters',
-	'FT' => 'Feet',
-	'YD' => 'Yards',
-	'IN' => 'Inches'
-);
-// Set range unit, override if valid unit is requested.
-$range_unit = 'M';
-if (isset($_REQUEST['range_unit'])) {
-	if (array_key_exists($_REQUEST['range_unit'],$range_units)) {
-		$range_unit = $_REQUEST['range_unit'];
-	}
-}
-
-// Set range
-$range = 10;
-
-if (isset($_REQUEST['range'])) {
-	$_REQUEST['range'] = dist($_REQUEST['range'],$range_unit,'IN',0);
-	if (($_REQUEST['range'] >= 0) && ($_REQUEST['range'] <= 20000)) {
-		$range = $_REQUEST['range'];
-	}
-}
-
-// END range
-
-
-// Load maplist and gametypes
-//$mldata = json_decode(file_get_contents("{$datapath}/thirdparty/maplist.json"),true);
-$gtlist = json_decode(file_get_contents("{$datapath}/thirdparty/gamemodes.json"),true);
-$gametypelist = array();
-foreach ($gtlist as $type=>$modes) {
-	foreach ($modes as $mode) {
-		$gametypelist[$mode] = "{$type}: {$mode}";
-	}
-}
-// explode(":",implode(array_values($gtlist['pvp'] + $gtlist['coop']),":"));
-
-
-
 /*
 ================================================================================
 ===                                                                          ===
@@ -602,3 +559,45 @@ if (isset($_REQUEST['theater_compare'])) {
 	}
 }
 // END theater
+// BEGIN range
+// Units of measurement
+$range_units = array(
+	'U' => 'Game Units',
+	'M' => 'Meters',
+	'FT' => 'Feet',
+	'YD' => 'Yards',
+	'IN' => 'Inches'
+);
+// Set range unit, override if valid unit is requested.
+$range_unit = 'M';
+if (isset($_REQUEST['range_unit'])) {
+	if (array_key_exists($_REQUEST['range_unit'],$range_units)) {
+		$range_unit = $_REQUEST['range_unit'];
+	}
+}
+
+// Set range
+$range = 10;
+
+if (isset($_REQUEST['range'])) {
+	$_REQUEST['range'] = dist($_REQUEST['range'],$range_unit,'IN',0);
+	if (($_REQUEST['range'] >= 0) && ($_REQUEST['range'] <= 20000)) {
+		$range = $_REQUEST['range'];
+	}
+}
+
+// END range
+
+
+// Load maplist and gametypes
+//$mldata = json_decode(file_get_contents("{$datapath}/thirdparty/maplist.json"),true);
+$gtlist = json_decode(file_get_contents("{$datapath}/thirdparty/gamemodes.json"),true);
+$gametypelist = array();
+foreach ($gtlist as $type=>$modes) {
+	foreach ($modes as $mode) {
+		$gametypelist[$mode] = "{$type}: {$mode}";
+	}
+}
+// explode(":",implode(array_values($gtlist['pvp'] + $gtlist['coop']),":"));
+
+

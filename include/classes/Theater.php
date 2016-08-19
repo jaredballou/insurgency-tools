@@ -116,13 +116,11 @@ function ParseTheaterFile($filename,$mod='',$version='',$path='',&$base_theaters
 			}
 			// Merge all base files into basedata array
 			foreach ($bases as $base) {
-//var_dump("base {$base}");
 				if (in_array($base,array_keys($base_theaters)) === true)
 					continue;
 				$base_file = GetDataURL("scripts/theaters/{$base}",$mod,$version);
 				$cachedata['base'][$base] = md5($base_file);
 				$base_theaters[$base] = $cachedata['base'][$base];
-//var_dump("processing base {$base}");
 				$basedata = array_merge_recursive(ParseTheaterFile($base,$mod,$version,$path,$base_theaters,$depth+1),$basedata);
 			}
 			// Merge this theater on top of combined base
@@ -130,20 +128,7 @@ function ParseTheaterFile($filename,$mod='',$version='',$path='',&$base_theaters
 		} else {
 			$cachedata['theater'] = $thisfile["theater"];
 		}
-/*
-		// Include parts that might be conditional in their parents, basically put everything in flat arrays
-		// This isn't congruent with how the game handles them, I believe this ougght to be a selector in the UI that can handle this better
-		foreach ($cachedata['theater'] as $sec => $data) {
-			foreach ($data as $key => $val) {
-				if (($key[0] == '?') && (is_array($val))) {
-					unset($cachedata['theater'][$sec][$key]);
-					$cachedata['theater'][$sec] = $val;// theater_array_replace_recursive($cachedata['theater'][$sec],$val);
-				}
-			}
-		}
-*/
 		// Save cache data
-//var_dump($cachedata);
 		PutCacheFile($cachefile,$cachedata);
 	}
 	// Send back theater object
@@ -514,4 +499,20 @@ function GenerateTheater() {
 	//var_dump($kvdata);
 	return implode("\n",$hdr)."\n".$kvdata;
 }
-?>
+
+function DisplayTheaterConditions($list_paths=0) {
+	global $theater_conditions;
+	if (!count($theater_conditions)) {
+		return;
+	}
+	echo "<div class='theater_conditions_title'>Theater Conditions</div>\n";
+	foreach ($theater_conditions as $tc => $paths) {
+		echo "<input type='checkbox' name='theater_conditions[{$tc}]'> {$tc}";
+		if ($list_paths) {
+			echo " [";
+			echo implode(", ",$paths);
+			echo "]";
+		}
+		echo "<br>\n";
+	}
+}
