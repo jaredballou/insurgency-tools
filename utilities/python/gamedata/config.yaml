@@ -27,15 +27,61 @@ games:
     game_name: "insurgency2"
     game_dir: "insurgency"
 map_files:
-  bsp: "maps/%(name)s.bsp"
-  nav: "maps/%(name)s.nav"
-  cpsetup_txt: "maps/%(name)s.txt"
-  json: "maps/parsed/%(name)s.json"
-  vmf: "maps/src/%(name)s_d.vmf"
-  overview_txt: "resource/overviews/%(name)s.txt"
-  overview_vmt: "materials/overviews/%(name)s.vmt"
-  overview_vtf: "materials/overviews/%(name)s.vtf"
-  overview_png: "materials/overviews/%(name)s.png"
+  bsp:
+    "path": "maps"
+    "match": "%(name)s.bsp"
+  cpsetup_txt:
+    "path": "maps"
+    "match": "%(name)s.txt"
+  json:
+    "type": "output"
+    "path": "maps/parsed"
+    "match": "%(name)s.json"
+  nav:
+    "path": "maps"
+    "match": "%(name)s.nav"
+  overlay:
+    "path": "maps/overlays"
+    "match": "%(name)s.json"
+  overview_png:
+    "path": "materials/overviews"
+    "match": "%(name)s.png"
+  overview_txt:
+    "path": "resource/overviews"
+    "match": "%(name)s.txt"
+  overview_vmt:
+    "path": "materials/overviews"
+    "match": "%(name)s.vmt"
+  overview_vtf:
+    "path": "materials/overviews"
+    "match": "%(name)s.vtf"
+  vmf:
+    "path": "maps/src"
+    "match": "%(name)s_d.vmf"
+map_entities:
+  "ins_blockzone": {}
+  "ins_spawnzone": {}
+  "obj_weapon_cache": {}
+  "point_controlpoint": {}
+  "trigger_capture_zone": {}
+map_entities_props:
+  "angles":
+    type: vertex
+  "blockzone":
+    type: entity
+  "classname": {}
+  "model": {}
+  "origin":
+    type: vertex
+  "printname":
+    type: translate
+  "skin": {}
+  "spawnflags": {}
+  "SquadID": {}
+  "StartDisabled": {}
+  "targetname":
+    type: name
+  "TeamNum": {}
 tools:
   bspsrc: "../../thirdparty/bspsrc/bspsrc.jar"
   pakrat: "../../thirdparty/pakrat/pakrat.jar"
