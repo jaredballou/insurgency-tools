@@ -16,6 +16,7 @@ import sys
 import vpk
 import vdf
 import yaml
+from config import *
 from game import *
 
 class GameData(object):
@@ -28,25 +29,13 @@ class GameData(object):
 	"""
 	def __init__(self, config_file = None, extract_root=None):
 		"""Initialize the GameData object"""
-		if config_file is None:
-			config_file = self.find_config_file()
 		self.games = {}
-		self.load_config_file(config_file)
+		self.config = {}
+		self.conf = Config(parent=self, config_file=config_file)
 		if extract_root is None:
 			extract_root = self.config['extract_root']
 		self.set_extract_root(extract_root)
 		self.load_games()
-
-	def find_config_file(self, config_file="config.yaml"):
-		"""Find the config file in each subdir until found or failed."""
-		
-		check_dir = os.path.dirname(__file__)
-		while len(check_dir) > 1:
-			check_file = os.path.join(check_dir,config_file)
-			if os.path.exists(check_file):
-				return check_file
-			check_dir = os.path.dirname(check_dir)
-		return False
 
 	def set_extract_root(self,extract_root,update_games=False):
 		"""Set the default root path for extraction.
@@ -58,18 +47,6 @@ class GameData(object):
 		if update_games:
 			for name in self.games.keys():
 				self.games[name].extract_root = extract_root
-
-	def load_config_file(self,config_file):
-		"""Load the config.yaml file
-			Args:
-				config_file (str): Full path to YAML file
-		"""
-		if os.path.isfile(config_file):
-			with open(config_file, 'r') as ymlfile:
-				self.config = yaml.load(ymlfile)
-				self.config_file = config_file
-		else:
-			print("ERROR: Cannot find '%s'!" % config_file)
 
 	def load_games(self):
 		"""Load all games from the config as Game objects and process

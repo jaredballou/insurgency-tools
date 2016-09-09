@@ -17,10 +17,13 @@ from shutil import copyfile
 import subprocess
 import sys
 import vpk
+from vdf.theater import Theater
 import vdf
 import yaml
 
-from pprint import pprint
+regex_float = r'[\.\deE\+\-]+'
+regex_vertex = r'(' + regex_float + r')\s*(' + regex_float + r')\s*(' + regex_float + r')'
+regex_plane = r'\(' + regex_vertex + r'\)'
 
 class Vertex(object):
 	def __init__(self, x=0, y=0, z=0):
@@ -29,7 +32,11 @@ class Vertex(object):
 			z = x.z
 			x = x.x
 		elif type(x) == str:
-			x, y, z = re.findall(r'(\d+)\s+(\d+)\s+(\d+)', x)
+			d = re.findall(regex_vertex, x)
+			if len(d) == 3:
+				x, y, z = d
+			else:
+				return
 		elif type(x) in [list, tuple, set]:
 			x, y, z = x
 		self.x = float(x)
@@ -45,14 +52,17 @@ class Plane:
 		"""Create a new Vertex representing the position (x, y, z)."""
 		if type(v0) == str:
 			# If we got a string, split it into three vertices
-			d = re.findall(r'\(([0-9\.\-]+)\s+([0-9\.\-]+)\s+([0-9\.\-]+)\)', v0)
-			self.v0 = Vertex(d[0])
-			self.v1 = Vertex(d[1])
-			self.v2 = Vertex(d[2])
-		else:
-			self.v0 = v0
-			self.v1 = v1
-			self.v2 = v2
+			d = re.findall(regex_plane, v0)
+			#r'\(([\.\deE\+\-]+)\s*([\.\deE\+\-]+)\s*([\.\deE\+\-]+)\)'
+			if len(d) == 3:
+				v0 = Vertex(d[0])
+				v1 = Vertex(d[1])
+				v2 = Vertex(d[2])
+			else:
+				return
+		self.v0 = Vertex(v0)
+		self.v1 = Vertex(v1)
+		self.v2 = Vertex(v2)
 
 	def __repr__(self):
 		return '(%s) (%s) (%s)' % (self.v0, self.v1, self.v2)
@@ -103,13 +113,13 @@ class Entity(object):
 						setattr(self.max, axis, val)
 					if val < min:
 						setattr(self.min, axis, val)
-		#print("min: {} max: {}".format(self.min, self.max))
 
 	def load_propdefs(self, propdefs):
 		"""Load property definitions into global object settings"""
 		self.propdefs = propdefs.copy()
 """
 	def __repr__(self):
+		return vars(self)
 		# TODO: Represent as '"<id>" { "<field>" "<val>".... }'
 		'"{}" "{}"'.format(for prop, propconf in self.propdefs.iteritems()
 			if prop in self:
@@ -118,6 +128,17 @@ class Entity(object):
 				setattr(self, prop, None)
 		return '(%s) (%s) (%s)' % (self.v0, self.v1, self.v2)
 """
+class MapFile(object):
+	def __init__(self, name, parent, type=None, path=None, match=None, filename=None, checksum=None, content=None):
+		self.name = name
+		self.parent = parent
+		self.type = type
+		self.path = path
+		self.match = match
+		self.filename = filename
+		self.checksum = checksum
+		self.content = content
+
 class Map(object):
 	"""Object that handles BSP, NAV, and TXT (CPSetup) files in /maps/ directory. Also manages /resource/overviews/%(map).txt overview settings.
 		Attributes:
@@ -127,16 +148,19 @@ class Map(object):
 			 (): 
 			 (): 
 	"""
+	mapdata_version = 1
 	def __init__(self, parent, name, bsp=None, nav=None, cpsetup_txt=None, overview_txt=None, overview_vtf=None, parsed_file=None, vmf_file=None, do_parse=True, decompile=True, unpack_files=True):
 		"""
 			Args:
 		"""
 		self.parent = parent
 		self.name = name
+		print("Checking map '{}'".format(name))
 		# Load propdefs into Entity object
 		Entity().load_propdefs(propdefs=self.parent.parent.config['map_entities_props'])
 		self.map = vdf.VDFDict()
 		self.map_files = {}
+		self.map_files_checksums = {}
 		self.map_files_paths = {}
 		self.map_files_data = vdf.VDFDict()
 		self.entities = []
@@ -148,6 +172,18 @@ class Map(object):
 		self.parse_map_files()
 		self.export_parsed()
 
+	def md5Checksum(self, filename):
+		if not os.path.exists(filename):
+			return None
+		with open(filename, 'rb') as fh:
+			m = hashlib.md5()
+			while True:
+				data = fh.read(8192)
+				if not data:
+					break
+				m.update(data)
+			return m.hexdigest()
+
 	def find_map_files(self):
 		"""Find the source files, if they exist"""
 		for file_type, file_conf in self.parent.parent.config['map_files'].iteritems():
@@ -157,10 +193,10 @@ class Map(object):
 				file_root = self.parent.extract_root
 			file_path = os.path.join(file_conf["path"] % vars(self), file_conf["match"]% vars(self))
 			self.map_files[file_type] = self.parent.find_file(file=file_path, default=None)
+			if self.map_files[file_type] is not None:
+				self.map_files_checksums[file_type] = self.md5Checksum(filename=self.map_files[file_type])
 			self.map_files_paths[file_type] = os.path.join(file_root, file_path)
 			#self.source_files[file_type] = 
-			#pprint("file_type: {} map_files: {} map_files_paths: {}".format(file_type, self.map_files[file_type], self.map_files_paths[file_type]))
-
 
 	def load_keyvalues(self, file=None, striplevels=0):
 		"""Load file as KeyValues.
@@ -173,9 +209,16 @@ class Map(object):
 		if not os.path.exists(file):
 			print("Cannot find '{}'".format(file))
 			return None
-		data = vdf.parse(open(file), mapper=vdf.VDFDict)
+		data = Theater(filename=file).processed
 		for x in range(0, striplevels):
-			data = data.itervalues().next()
+			iv = data.itervalues()
+			while True:
+				next = iv.next()
+				if next is None:
+					return {}
+				if isinstance(next, vdf.VDFDict):
+					data = next
+					break
 		return data
 
 	def dump_vdf(self, data):
@@ -187,12 +230,34 @@ class Map(object):
 		for type,file in self.map_files.iteritems():
 			if file is None:
 				continue
-			# TODO: Use hashlib.md5 to check all files. Only parse the ones that have changed.
+			if not self.file_needs_parsing(type):
+				continue
+			print("Parsing {}".format(type))
 			getattr(self, "parse_{}".format(type))()
+			self.find_map_files()
+
+	def file_needs_parsing(self, type):
+		"""Determine if a file type needs to be processed"""
+		# TODO: Support output type skipping
+		if not "json" in self.map_files_data:
+			return True
+		if not "map_files_checksums" in self.map_files_data["json"]:
+			return True
+		if not type in self.map_files_checksums:
+			return True
+		if not type in self.map_files_data["json"]["map_files_checksums"]:
+			return True
+		if self.map_files_data["json"]["map_files_checksums"][type] != self.map_files_checksums[type]:
+			return True
+		if not "mapdata_version" in self.map_files_data["json"]:
+			return True
+		if self.map_files_data["json"]["mapdata_version"] != self.mapdata_version:
+			return True
+		return False
 
 	def parse_bsp(self, force=False):
 		"""Decompile BSP file to VMF"""
-		if not force and os.path.exists(self.map_files["vmf"]):
+		if not force and "vmf" in self.map_files and self.map_files["vmf"] is not None and os.path.exists(self.map_files["vmf"]):
 			return False
 		self.decompile_bsp()
 		self.extract_bsp()
@@ -200,6 +265,14 @@ class Map(object):
 	def parse_vmf(self):
 		"""Parse decompiled BSP contents"""
 		self.map_files_data["vmf"] = self.load_keyvalues(file=self.map_files["vmf"])
+		for type, entity in self.map_files_data["vmf"].iteritems():
+			if type != "entity":
+				continue
+			if not "classname" in entity:
+				continue
+			if not entity['classname'] in self.parent.parent.config["map_entities"]:
+				continue
+			self.entities.append(Entity(entity=entity))
 
 	def parse_nav(self):
 		"""Parse NAV file and export JSON object with relevant data"""
@@ -212,14 +285,6 @@ class Map(object):
 	def parse_overview_txt(self):
 		"""Process Overview text file"""
 		self.map_files_data["overview_txt"] = self.load_keyvalues(file=self.map_files["overview_txt"], striplevels=1)
-
-	def parse_json(self):
-		"""Load existing parsed JSON file, if it exists"""
-		if not os.path.exists(self.map_files_paths["json"]):
-			return
-		with open(self.map_files_paths["json"]) as data_file:
-			data = json.load(data_file)
-		#pprint(data)
 
 	def parse_overview_vmt(self):
 		pass
@@ -249,24 +314,38 @@ class Map(object):
 		except:
 			print("Failed")
 
+	def parse_json(self):
+		"""Load existing parsed JSON file, if it exists"""
+		if not os.path.exists(self.map_files_paths["json"]):
+			return
+		try:
+			with open(self.map_files_paths["json"]) as data_file:
+				self.map_files_data["json"] = json.load(data_file)
+		except:
+			self.map_files_data["json"] = {}
+
 	def export_parsed(self):
 		"""Export all parsed data to single JSON file for all map objects."""
-		for type, entity in self.map_files_data["vmf"].iteritems():
-			if type != "entity":
-				continue
-			if not "classname" in entity:
-				continue
-			if not entity['classname'] in self.parent.parent.config["map_entities"]:
-				continue
-			self.entities.append(Entity(entity=entity))
+		mapdata = {
+			'mapdata_version': self.mapdata_version,
+			'map_files_checksums': self.map_files_checksums,
+			'map': self.map,
+		}
+		for file in ["overview_txt", "cpsetup_txt"]:
+			if file in self.map_files_data:
+				mapdata[file] = self.map_files_data[file]
+			else:
+				mapdata[file] = {"missing": True}
+		self.create_path(self.map_files_paths["json"])
+		with open(self.map_files_paths["json"], "w") as outfile:
+			json.dump(mapdata, outfile, indent=4)
 
-
-		self.dump_vdf(data=self.map)
-		pprint(self.entities)
-		sys.exit()
-		#with open(self.map_files_paths["json"], "w") as outfile:
-		#	json.dump(self.map, outfile, indent=4)
-
+	def create_path(self, filename):
+		"""Create directory tree needed for this file"""
+		dirname = os.path.dirname(filename)
+		if not os.path.exists(dirname):
+			print("Creating {}".format(dirname))
+			os.makedirs(dirname)
 """
 		BASENAME=$(basename "${MAP}" .bsp)
 		SRCFILE="${DATADIR}/maps/src/${BASENAME}_d.vmf"
