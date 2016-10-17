@@ -137,6 +137,9 @@ function GetCVARList($mod,$version,$cvarlist) {
 	// Load CVAR list
 	$listfile = "${datapath}/mods/{$mod}/{$version}/cvarlist/{$cvarlist}.csv";
 	$f = fopen($listfile, "r");
+	if (!$f) {
+		return;
+	}
 	// Load the file into fields
 	while (($line = fgetcsv($f)) !== false) {
 		// First line is field names

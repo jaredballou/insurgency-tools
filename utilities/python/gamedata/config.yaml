@@ -1,5 +1,5 @@
 ---
-do_maps: true
+do_maps: false
 do_materials: true
 do_vpks: true
 extract_paths:

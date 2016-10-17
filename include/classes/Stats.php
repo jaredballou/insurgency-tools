@@ -502,6 +502,7 @@ function DisplayWikiView() {
 	
 }
 function DisplayHLStatsX() {
+	global $mod;
 	global $theater;
 	echo "<pre>";
 	$values = array();
@@ -533,10 +534,10 @@ function DisplayHLStatsX() {
 		}
 		$wpnname = getlookup(getval($item,"print_name"));
 		$wn = str_replace('weapon_','', $weapon);
-		$values['Awards'][] = "('insurgency', '{$weapon}', '{$wpnname}', 'Kills with {$wpnname}')";
-		$values['Ribbons'][] = "('insurgency', '{$weapon}', '10', '0', 'rg_{$wn}.png', 'Gold {$wpnname}')";
-		$values['Ribbons'][] = "('insurgency', '{$weapon}', '5', '0', 'rs_{$wn}.png', 'Silver {$wpnname}')";
-		$values['Weapons'][] = "('insurgency', '{$weapon}', '{$wpnname}', '1.00')";
+		$values['Awards'][] = "('{$mod}', '{$weapon}', '{$wpnname}', 'Kills with {$wpnname}')";
+		$values['Ribbons'][] = "('{$mod}', '{$weapon}', '10', '0', 'rg_{$wn}.png', 'Gold {$wpnname}')";
+		$values['Ribbons'][] = "('{$mod}', '{$weapon}', '5', '0', 'rs_{$wn}.png', 'Silver {$wpnname}')";
+		$values['Weapons'][] = "('{$mod}', '{$weapon}', '{$wpnname}', '1.00')";
 	}
 
 	foreach ($theater['player_templates'] as $class => $classdata) {
@@ -544,12 +545,12 @@ function DisplayHLStatsX() {
 			continue;
 		}
 		$classname = getlookup(getval($classdata,'print_name'));
-		$shortclass = str_replace(array('template_','_insurgent','_security','_training','_elimination','_coop','coop_'),'', $class);
-		$values['Roles'][$shortclass] = "('insurgency','{$shortclass}','{$classname}')";
+		$shortclass = getclassname($class);
+		$values['Roles'][$shortclass] = "('{$mod}','{$shortclass}','{$classname}')";
 	}
 	foreach ($theater['teams'] as $team=>$teamdata) {
 		$teamname = getlookup(getval($teamdata,'name'));
-		$values['Teams'][] = "('insurgency','{$teamdata['name']}','{$teamname}')";
+		$values['Teams'][] = "('{$mod}','{$teamdata['name']}','{$teamname}')";
 	}
 	$dbprefix = $_REQUEST['dbprefix'] ? $_REQUEST['dbprefix'] : 'hlstats';
 	foreach ($tables as $table => $tdata) {
@@ -920,6 +921,13 @@ function getlookup($key) {
 		return $lang[$language][$key];
 	}
 	return $key;
+}
+
+/*
+*/
+function getclassname($class) {
+	global $class_name_remove;
+	return(implode("_",array_diff(explode("_",$class),$remove)));
 }
 
 function getval($object, $index, $default='') {

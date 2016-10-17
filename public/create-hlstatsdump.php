@@ -9,6 +9,7 @@ if (!isset($rootpath)) { do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirna
 $use_hlstatsx_db = 1;
 require_once("{$includepath}/header.php");
 $values = array();
+startbody();
 echo "<form>DB Prefix:<input type='text' name='dbprefix' value='{$dbprefix}'> Game code:<input type='text' name='gamecode' value='{$gamecode}'><input type='submit'></form>\n";
 echo "<textarea style='width: 100%; height: calc(100% - 50px); box-sizing: border-box;'>";
 echo "--\n-- Add Insurgency to games\n--\n\n";

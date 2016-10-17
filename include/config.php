@@ -309,6 +309,19 @@ $stats_tables = array(
 		)
 	)
 );
+$class_name_remove = array(
+	"1",
+	"2",
+	"american",
+	"british",
+	"coop",
+	"elimination",
+	"german",
+	"insurgent",
+	"security",
+	"template",
+	"training"
+);
 // Include the private config (never updated by Git) to override or set other variables
 $cfg_private="{$includepath}/config.private.php";
 if (file_exists($cfg_private)) {

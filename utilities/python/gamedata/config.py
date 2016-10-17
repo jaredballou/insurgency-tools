@@ -100,7 +100,7 @@ class Config(object):
 		"""Load list of attributes"""
 		self.attributes = {}
 		self.add_attribute(name="config_file", default="config.yaml", type=str, help="Config file to load")
-		self.add_attribute(name="do_maps", default=True, type=bool, help="Process maps")
+		self.add_attribute(name="do_maps", default=False, type=bool, help="Process maps")
 		self.add_attribute(name="do_materials", default=True, type=bool, help="Process materials")
 		self.add_attribute(name="do_vpks", default=True, type=bool, help="Process VPKs")
 		self.add_attribute(name="extract_paths", default={"maps/": "*.txt", "materials/overviews/": "*", "materials/vgui/gameui/": "*", "materials/vgui/hud/": "*", "materials/vgui/hud_doi/": "*", "materials/vgui/inventory/": "*", "materials/vgui/logos/": "*", "materials/vgui/maps/": "*", "resource/": "*.txt *.res", "scripts/playlists/": "*.playlist", "scripts/theaters/": "*.theater"}, type=dict, help="Paths to extract from game files")
