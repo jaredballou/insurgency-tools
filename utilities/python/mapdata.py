@@ -1,8 +1,6 @@
-#!/usr/bin/env php
-<?php
-/*
+#!/usr/bin/env python
+"""Map Data Processor
 ================================================================================
-mapdata.php
 (c) 2015,2016 Jared Ballou <insurgency@jballou.com>
 
 This is a tool to parse the map data files (Decompiled source, Overview, and
@@ -10,8 +8,18 @@ CPSetup text file) into the JSON format for the web viewer. It does a lot of
 modification to the data, converts all coordinates to map to the 1024x1024
 overview image, and adds in some information about the entities and points.
 ================================================================================
-*/
+"""
 
+# loop through mods
+# loop through maps
+# read cpsetup file
+# decompile map if needed
+# read map source file
+# read overview file
+# 
+
+
+"""
 //Root Path Discovery
 do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirname(__FILE__)); $tp="{$rd}/rootpath.php"; if (file_exists($tp)) { require_once($tp); break; }} while ($rd != '/');
 
@@ -476,3 +484,4 @@ function CreatePoint($entity,$mapname) {
 	return $point;
 }
 
+"""

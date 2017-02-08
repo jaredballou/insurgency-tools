@@ -9,16 +9,26 @@ if (!isset($rootpath)) { do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirna
 $use_hlstatsx_db = 1;
 require_once("{$includepath}/header.php");
 $values = array();
+
+$games = array(
+	"doi" => "Day of Infamy",
+	"insurgency" => "Insurgency"
+);
+
 startbody();
-echo "<form>DB Prefix:<input type='text' name='dbprefix' value='{$dbprefix}'> Game code:<input type='text' name='gamecode' value='{$gamecode}'><input type='submit'></form>\n";
+echo "<form>Game:<select name='game'>";
+foreach ($games as $code => $name) {
+	echo "<option value='{$code}'>{$name}</option>";
+}
+echo "</select> DB Prefix:<input type='text' name='dbprefix' value='{$dbprefix}'> Custom DB Game code:<input type='text' name='gamecode' value=''><input type='submit'></form>\n";
 echo "<textarea style='width: 100%; height: calc(100% - 50px); box-sizing: border-box;'>";
-echo "--\n-- Add Insurgency to games\n--\n\n";
-echo "INSERT IGNORE INTO `{$dbprefix}_Games` (`code`, `name`, `hidden`, `realgame`) VALUES ('{$gamecode}', 'Insurgency', '0', '{$gamecode}');\n";
-echo "INSERT IGNORE INTO `{$dbprefix}_Games_Supported` (`code`, `name`) VALUES ('{$gamecode}', 'Insurgency');\n";
+echo "--\n-- Add {$games[$game]} to games\n--\n\n";
+echo "INSERT IGNORE INTO `{$dbprefix}_Games` (`code`, `name`, `hidden`, `realgame`) VALUES ('{$gamecode}', '{$games[$game]}', '0', '{$gamecode}');\n";
+echo "INSERT IGNORE INTO `{$dbprefix}_Games_Supported` (`code`, `name`) VALUES ('{$gamecode}', '{$games[$game]}');\n";
 foreach ($tables as $table => $tdata) {
 	$mf = current(array_values($tdata['allfields']));
 //var_dump($mf);
-	$result = mysql_query("select * from {$dbprefix}_{$table} where {$mf}='insurgency' ORDER BY {$tdata['fields'][0]}");
+	$result = mysql_query("select * from {$dbprefix}_{$table} where {$mf}='{$games[$game]}' ORDER BY {$tdata['fields'][0]}");
 	while ($row = mysql_fetch_array($result)) {
 		$val = array();
 		$row[$mf] = $gamecode;
