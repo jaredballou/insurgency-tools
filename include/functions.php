@@ -96,9 +96,12 @@ function GetDataFiles($filename,$mod=null,$version=null,$which=-1) {
 	$paths = array(
 		"{$datapath}/mods/{$mod}/{$version}",
 		"{$datapath}/mods/{$mod}/*",
-		"{$datapath}/mods/insurgency/{$version}",
-		"{$datapath}/mods/insurgency/{$latest_version}",
-		"{$datapath}/mods/insurgency/*",
+		"{$datapath}/mods/doi/latest",
+		"{$datapath}/mods/doi/*",
+//		"{$datapath}/mods/insurgency/{$version}",
+//		"{$datapath}/mods/insurgency/{$latest_version}",
+//		"{$datapath}/mods/insurgency/latest",
+//		"{$datapath}/mods/insurgency/*",
 		$datapath
 	);
 	$files = array();

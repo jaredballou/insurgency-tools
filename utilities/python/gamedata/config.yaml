@@ -1,20 +1,63 @@
 ---
-do_maps: false
-do_materials: true
-do_vpks: true
-extract_paths:
-  "maps/": "*.txt"
-  "materials/overviews/": "*"
-  "materials/vgui/gameui/": "*"
-  "materials/vgui/hud/": "*"
-  "materials/vgui/hud_doi/": "*"
-  "materials/vgui/inventory/": "*"
-  "materials/vgui/logos/": "*"
-  "materials/vgui/maps/": "*"
-  "resource/": "*.txt *.res"
-  "scripts/playlists/": "*.playlist"
-  "scripts/theaters/": "*.theater"
 extract_root: "../../data/mods"
+modules:
+  cvarlist:
+    enabled: true
+    extract_paths:
+    files_path: cvarlist
+    files:
+      - server.csv
+      - client.csv
+  maps:
+    enabled: false
+    extract_paths:
+      "maps/": "*.txt"
+  materials:
+    enabled: true
+    extract_paths:
+      "materials/overviews/": "*"
+      "materials/vgui/gameui/": "*"
+      "materials/vgui/hud/": "*"
+      "materials/vgui/hud_doi/": "*"
+      "materials/vgui/inventory/": "*"
+      "materials/vgui/logos/": "*"
+      "materials/vgui/maps/": "*"
+  models:
+    enabled: false
+    extract_paths:
+  resource:
+    enabled: true
+    extract_paths:
+      "resource/": "*.txt *.res"
+  scripts:
+    enabled: true
+    extract_paths:
+      "scripts/playlists/": "*.playlist"
+      "scripts/theaters/": "*.theater"
+  sourcemod:
+    enabled: true
+    extract_paths:
+    files_path: sourcemod
+    files:
+      - classes.txt
+      - datamaps.txt
+      - netprops.txt
+      - netprops.xml
+  vpks:
+    enabled: true
+    extract_paths:
+extract_paths:
+      "maps/": "*.txt"
+      "materials/overviews/": "*"
+      "materials/vgui/gameui/": "*"
+      "materials/vgui/hud/": "*"
+      "materials/vgui/hud_doi/": "*"
+      "materials/vgui/inventory/": "*"
+      "materials/vgui/logos/": "*"
+      "materials/vgui/maps/": "*"
+      "resource/": "*.txt *.res"
+      "scripts/playlists/": "*.playlist"
+      "scripts/theaters/": "*.theater"
 game_roots:
   - "/home/doiserver/serverfiles"
   - "/home/insserver/serverfiles"

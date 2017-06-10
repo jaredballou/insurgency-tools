@@ -72,7 +72,6 @@ class Config(object):
 		self.argparser = argparse.ArgumentParser(description="Extract files from installed games, and process files into format which is ussable by the web tools")
 		self.load_attributes()
 		self.load_config_file(config_file)
-		self.parent.config = self.config
 
 	def set_value(self, name, value):
 		self.config[name] = value
@@ -82,7 +81,7 @@ class Config(object):
 		if os.path.isfile(config_file):
 			with open(config_file, "r") as ymlfile:
 				self.config = yaml.load(ymlfile)
-				self.parent.config_file = config_file
+				self.config_file = config_file
 				self.update_attributes()
 		else:
 			print("ERROR: Cannot find '%s'!" % config_file)
@@ -110,6 +109,7 @@ class Config(object):
 		self.add_attribute(name="map_files", default={"bsp":{"path": "maps", "match": "%(name)s.bsp"}, "cpsetup_txt":{"path": "maps", "match": "%(name)s.txt"}, "json":{"type": "output", "path": "maps/parsed", "match": "%(name)s.json"}, "nav":{"path": "maps", "match": "%(name)s.nav"}, "overlay":{"path": "maps/overlays", "match": "%(name)s.json"}, "overview_png":{"path": "materials/overviews", "match": "%(name)s.png"}, "overview_txt":{"path": "resource/overviews", "match": "%(name)s.txt"}, "overview_vmt":{"path": "materials/overviews", "match": "%(name)s.vmt"}, "overview_vtf":{"path": "materials/overviews", "match": "%(name)s.vtf"}, "vmf":{"path": "maps/src", "match": "%(name)s_d.vmf"}}, type=dict, help="Files used to process maps")
 		self.add_attribute(name="map_entities", default={"ins_blockzone": {}, "ins_spawnzone": {}, "obj_weapon_cache": {}, "point_controlpoint": {}, "trigger_capture_zone": {}}, type=dict, help="Entities to process from maps")
 		self.add_attribute(name="map_entities_props", default={"angles":{"type": "vertex"}, "blockzone":{"type": "entity"}, "classname": {}, "model": {}, "origin":{"type": "vertex"}, "printname":{"type": "translate"}, "skin": {}, "spawnflags": {}, "SquadID": {}, "StartDisabled": {}, "targetname":{"type": "name"}, "TeamNum": {}}, type=dict, help="Properties of map entities that we want to process")
+		self.add_attribute(name="modules", default={}, type=dict, help="Modules")
 		self.add_attribute(name="tools", default={"bspsrc": "../../thirdparty/bspsrc/bspsrc.jar", "pakrat": "../../thirdparty/pakrat/pakrat.jar", "vtf2tga": "../../utilities/vtf2tga/vtf2tga"}, type=dict, help="External tools used to process data")
 		self.add_attribute(name="vpk_files", default=["misc", "materials"], type=list, help="List of VPK files to use for pulling files")
 		self.args = vars(self.argparser.parse_args())

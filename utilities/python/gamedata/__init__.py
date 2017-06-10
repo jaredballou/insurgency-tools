@@ -30,8 +30,8 @@ class GameData(object):
 	def __init__(self, config_file = None, extract_root=None):
 		"""Initialize the GameData object"""
 		self.games = {}
-		self.config = {}
 		self.conf = Config(parent=self, config_file=config_file)
+		self.config = self.conf.config
 		if extract_root is None:
 			extract_root = self.config['extract_root']
 		self.set_extract_root(extract_root)
