@@ -9,7 +9,9 @@ if (!isset($rootpath)) { do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirna
 $use_hlstatsx_db = 1;
 require_once("{$includepath}/header.php");
 $values = array();
-
+$gamecode="insurgency";
+$game="insurgency";
+$dbprefix="hlstats";
 $games = array(
 	"doi" => "Day of Infamy",
 	"insurgency" => "Insurgency"

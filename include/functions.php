@@ -3,6 +3,15 @@
 if (!isset($rootpath)) { do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirname(__FILE__)); $tp="{$rd}/rootpath.php"; if (file_exists($tp)) { require_once($tp); break; }} while ($rd != '/'); }
 // These variables must be set before anything else
 
+foreach( $argv as $argument ) {
+	if( $argument == $argv[0])
+		continue;
+	if( $argument == $argv[1] && $argv[0] == "php")
+		continue;
+	$pair = explode( "=", $argument );
+	$_REQUEST[$pair[0]] = $pair[1];
+}
+
 // includepath is the include directory
 $includepath = realpath(dirname(__FILE__));
 // rootpath is the insurgency-tools root
@@ -445,7 +454,7 @@ $mods = LoadMods("{$datapath}/mods");
 ksort($mods);
 
 // Default mod
-$mod="insurgency";
+$mod="doi";
 
 // If mod in request is valid, use it
 if (isset($_REQUEST['mod'])) {

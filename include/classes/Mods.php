@@ -1,4 +1,14 @@
 <?php
+/*
+TODO:
+[ ] Load metadata files
+[ ] Use proper base chain for mods
+[ ] 
+[ ] 
+[ ] 
+
+*/
+
 // Load mods
 function LoadMods($path,$pattern='*',$level=0) {
 	$result = array();
@@ -11,7 +21,11 @@ function LoadMods($path,$pattern='*',$level=0) {
 		if (is_dir($file)) {
 			$result[$basename] = LoadMods($item,$pattern,$level+1);
 		} else {
-			// Don't list files that are part of the mod metadata structure
+/*
+			if ($basename == "metadata.yaml") {
+				$result['metadata'] = Spyc::YAMLLoad($file);
+			}
+*/
 			if ($level > 1) {
 				$result[$basename] = "{$dirname}/{$basename}";
 			}

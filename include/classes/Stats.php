@@ -908,20 +908,6 @@ function printarray($object, $index, $link=0, $nulldisp='&nbsp;', $prefix='') {
 	}
 	return $data.implode('<br>', $arr);
 }
-/*
-getlookup
-Returns a string localized
-*/
-function getlookup($key) {
-	global $language, $lang;
-	if (is_array($key))
-		$key = end($key);
-	if (substr($key,0,1) == "#") {
-		$key = strtolower($key);
-		return $lang[$language][$key];
-	}
-	return $key;
-}
 
 /*
 */

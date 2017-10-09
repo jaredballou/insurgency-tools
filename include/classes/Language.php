@@ -26,8 +26,8 @@ function LoadLanguages($pattern='English') {
 	}
 
 	// Load all language files
-	$langfiles = GetDataFiles("resource/*_".strtolower($pattern).".txt");
-//var_dump($langfiles);
+	$langfiles = array_unique(array_merge(GetDataFiles("resource/*_".strtolower($pattern).".txt"), GetDataFiles("resource/*/*_".strtolower($pattern).".txt")), SORT_REGULAR);
+
 	foreach ($langfiles as $langfile) {
 		$data = trim(preg_replace($langfile_regex, '', file_get_contents($langfile)));
 		$data = parseKeyValues($data,false);
@@ -48,4 +48,18 @@ function LoadLanguages($pattern='English') {
 		}
 	}
 //var_dump($lang);
+}
+/*
+getlookup
+Returns a string localized
+*/
+function getlookup($key) {
+	global $language, $lang;
+	if (is_array($key))
+		$key = end($key);
+	if (substr($key,0,1) == "#") {
+		$key = strtolower($key);
+		return $lang[$language][$key];
+	}
+	return $key;
 }
