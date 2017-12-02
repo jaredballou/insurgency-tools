@@ -26,8 +26,11 @@ function LoadLanguages($pattern='English') {
 	}
 
 	// Load all language files
-	$langfiles = array_unique(array_merge(GetDataFiles("resource/*_".strtolower($pattern).".txt"), GetDataFiles("resource/*/*_".strtolower($pattern).".txt")), SORT_REGULAR);
-
+	$langfiles = GetDataFiles("resource/*_".strtolower($pattern).".txt");
+	$subdir_files = GetDataFiles("resource/*/*_".strtolower($pattern).".txt");
+	if (is_array($subdir_files)) {
+		$langfiles = array_unique(array_merge($langfiles, $subdir_files), SORT_REGULAR);
+	}
 	foreach ($langfiles as $langfile) {
 		$data = trim(preg_replace($langfile_regex, '', file_get_contents($langfile)));
 		$data = parseKeyValues($data,false);

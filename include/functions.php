@@ -3,13 +3,15 @@
 if (!isset($rootpath)) { do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirname(__FILE__)); $tp="{$rd}/rootpath.php"; if (file_exists($tp)) { require_once($tp); break; }} while ($rd != '/'); }
 // These variables must be set before anything else
 
-foreach( $argv as $argument ) {
-	if( $argument == $argv[0])
-		continue;
-	if( $argument == $argv[1] && $argv[0] == "php")
-		continue;
-	$pair = explode( "=", $argument );
-	$_REQUEST[$pair[0]] = $pair[1];
+if (is_array($argv)) {
+	foreach( $argv as $argument ) {
+		if( $argument == $argv[0])
+			continue;
+		if( $argument == $argv[1] && $argv[0] == "php")
+			continue;
+		$pair = explode( "=", $argument );
+		$_REQUEST[$pair[0]] = $pair[1];
+	}
 }
 
 // includepath is the include directory
