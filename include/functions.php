@@ -49,17 +49,19 @@ if (!file_exists($cachepath)) {
 }
 
 // Connect to HLStatsX database if requested
+$mysql_safe = array();
 if (isset($use_hlstatsx_db)) {
 	// If HLStatsX config exists, try that first
 	if (file_exists($hlstatsx_config)) {
 		require $hlstatsx_config;
-		mysql_connect(DB_HOST,DB_USER,DB_PASS);
-		$mysql_connection = mysql_select_db(DB_NAME);
+		$mysqli = new mysqli(DB_HOST,DB_USER,DB_PASS,DB_NAME);
 	}
 	// If no database connected (either config missing or failed to connect) use fallback
-	if (@!$mysql_connection) {
-		mysql_connect($mysql_server,$mysql_username,$mysql_password);
-		$mysql_connection = mysql_select_db($mysql_database);
+	if (@!$mysqli) {
+		$mysqli = new mysqli($mysql_server,$mysql_username,$mysql_password,$mysql_database);
+	}
+	foreach ($_REQUEST as $key => $val) {
+		$mysql_safe[$key] = mysqli_real_escape_string($mysqli, $val);
 	}
 }
 

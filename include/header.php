@@ -16,7 +16,7 @@ if (!isset($title)) {
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'></script>
-    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
 <!-- Latest compiled and minified CSS -->
 <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css'>
@@ -31,7 +31,7 @@ if (!isset($title)) {
     <script src='//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js'></script>
 
 <!-- D3 -->
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 <link rel="stylesheet" href="<?php echo "{$GLOBALS['urlbase']}include/style.css"; ?>">
 

@@ -8,21 +8,45 @@ create or update the items in HLStatsX.
 if (!isset($rootpath)) { do { $rd = (isset($rd)) ? dirname($rd) : realpath(dirname(__FILE__)); $tp="{$rd}/rootpath.php"; if (file_exists($tp)) { require_once($tp); break; }} while ($rd != '/'); }
 $use_hlstatsx_db = 1;
 require_once("{$includepath}/header.php");
-$values = array();
-$gamecode="insurgency";
-$game="insurgency";
-$dbprefix="hlstats";
+
 $games = array(
 	"doi" => "Day of Infamy",
 	"insurgency" => "Insurgency"
 );
 
+$values = array();
+
+if (in_array($mysql_safe['game'], array_keys($games))) {
+	$game=$mysql_safe['game'];
+} else {
+	$game = "insurgency";
+}
+if (isset($mysql_safe['gamecode']) && $mysql_safe['gamecode'] != "") {
+	$gamecode = $mysql_safe['gamecode'];
+} else {
+	$gamecode = $game;
+}
+if (isset($mysql_safe['dbprefix']) && $mysql_safe['dbprefix'] != "") {
+	$dbprefix=$mysql_safe['dbprefix'];
+} else {
+	$dbprefix="hlstats";
+}
+
+// Begin HTML
 startbody();
+// Begin form
 echo "<form>Game:<select name='game'>";
 foreach ($games as $code => $name) {
-	echo "<option value='{$code}'>{$name}</option>";
+	if ($code == $game) {
+		$sel = " SELECTED";
+	} else {
+		$sel = "";
+	}
+	echo "<option value='{$code}'{$sel}>{$name}</option>";
 }
-echo "</select> DB Prefix:<input type='text' name='dbprefix' value='{$dbprefix}'> Custom DB Game code:<input type='text' name='gamecode' value=''><input type='submit'></form>\n";
+echo "</select> DB Prefix:<input type='text' name='dbprefix' value='{$dbprefix}'> Custom DB Game code:<input type='text' name='gamecode' value='{$mysql_safe['gamecode']}'><input type='submit'></form>\n";
+// end form
+// Begin SQL dump
 echo "<textarea style='width: 100%; height: calc(100% - 50px); box-sizing: border-box;'>";
 echo "--\n-- Add {$games[$game]} to games\n--\n\n";
 echo "INSERT IGNORE INTO `{$dbprefix}_Games` (`code`, `name`, `hidden`, `realgame`) VALUES ('{$gamecode}', '{$games[$game]}', '0', '{$gamecode}');\n";
@@ -30,8 +54,10 @@ echo "INSERT IGNORE INTO `{$dbprefix}_Games_Supported` (`code`, `name`) VALUES (
 foreach ($tables as $table => $tdata) {
 	$mf = current(array_values($tdata['allfields']));
 //var_dump($mf);
-	$result = mysql_query("select * from {$dbprefix}_{$table} where {$mf}='{$games[$game]}' ORDER BY {$tdata['fields'][0]}");
-	while ($row = mysql_fetch_array($result)) {
+	$query = "select * from {$dbprefix}_{$table} where {$mf}='{$gamecode}' ORDER BY {$tdata['fields'][0]}";
+//	echo($query);
+	$result = $mysqli->query($query);
+	while ($row = $result->fetch_assoc()) {
 		$val = array();
 		$row[$mf] = $gamecode;
 		foreach ($tdata['allfields'] as $field) {
