@@ -25,8 +25,8 @@ class RCon {
 	var $ConnectTimeout=30;
 	var $TimeoutSeconds = 2;
 	var $TimeoutMicroseconds = 500;
-	// Constructor - 
-	function RCon ($Host='127.0.0.1',$Port=27015,$Password,$ConnectTimeout=30,$Seconds=2,$Microseconds=500) {
+
+	public function __construct($Host='127.0.0.1',$Port=27015,$Password,$ConnectTimeout=30,$Seconds=2,$Microseconds=500) {
 		$this->Password = $Password;
 		// If Host came in as ip:port format, unpack it
 		$bits = explode(':',$Host);
