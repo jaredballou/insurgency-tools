@@ -96,8 +96,11 @@ function matchTheaterPath($paths, $matches) {
 			// Compare each element of both paths
 			foreach ($match_parts as $mid=>$mpart) {
 				// Strip conditionals from each element to compare
-				$mpart = array_shift(explode("?",$mpart));
-				$ppart = array_shift(explode("?",$path_parts[$mid]));
+				$ppart = $path_parts[$mid];
+				if ($mpart[0] == '?') {
+					$mpart = array_shift(explode("?",$mpart));
+					$ppart = array_shift(explode("?",$ppart));
+				}
 				// If this element does not match, and neither element is a wildcard, stop checking this match
 				if (($mpart != $ppart) && ($ppart != '*') && ($mpart != '*')) {
 					continue 2;
@@ -339,7 +342,7 @@ function parseKeyValues($KVString,$fixquotes=true,$debug=false)
 					if ($comment) {
 						$comments[$line] = array('path' => $lastPath, 'where' => $where, 'line' => $line, 'line_text' => $KVLines[$line-1], 'comment' => $comment);
 					}
-					continue;
+					break;
 				}
 			default:
 				if ($isInQuote) {

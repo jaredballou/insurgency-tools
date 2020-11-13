@@ -482,7 +482,7 @@ if (isset($_REQUEST['mod_compare'])) {
 //BEGIN version
 
 $steam_ver=getSteamVersion();
-$newest_version = $version = isset($mods[$mod][$steam_ver]) ? $steam_ver : end(array_keys($mods[$mod]));
+$newest_version = $version = isset($mods[$mod][$steam_ver]) ? $steam_ver : array_key_last($mods[$mod]);
 
 // If version sent by request, set it as the version if it's valid.
 if (isset($_REQUEST['version'])) {
