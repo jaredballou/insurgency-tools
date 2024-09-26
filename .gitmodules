@@ -13,6 +13,6 @@
 [submodule "utilities/python/gamedata"]
 	path = utilities/python/gamedata
 	url = git@github.com:jaredballou/python-gamedata.git
-[submodule "utilities/python/vdf"]
-	path = utilities/python/vdf
+[submodule "utilities/vdf"]
+	path = utilities/vdf
 	url = git@github.com:jaredballou/vdf.git

@@ -519,7 +519,7 @@ function GetEntities($map,$gtname,$names='',$classnames='',$max=-1) {
 }
 
 // Display map if selected
-if (isset($map)) {
+if (isset($map) && isset($maps[$map])) {
 	// Load gametype data
 	$gametypes = array_keys($maps[$map]['gametypes']);
 
