@@ -2,11 +2,11 @@
     "name": "jballou/insurgency-tools",
     "description": "Web based tools for processing game data files for Insurgency",
     "require": {
-        "twig/twig": "^1.24",
-        "smarty/smarty": "^3.1",
-        "koraktor/steam-condenser": "^1.3",
-        "lukezbihlyj/vdf-parser": "^1.0",
-        "phpFastCache/phpFastCache": "^4.3"
+        "twig/twig": ">=1.24",
+        "smarty/smarty": ">=4.5.3",
+        "koraktor/steam-condenser": ">=1.3",
+        "lukezbihlyj/vdf-parser": ">=1.0",
+        "phpfastcache/phpfastcache": ">=9.0"
     },
     "license": "GPLv2",
     "authors": [
